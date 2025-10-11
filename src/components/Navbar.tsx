@@ -6,7 +6,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LogIn, Search } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   searchQuery?: string;

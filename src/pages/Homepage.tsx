@@ -7,7 +7,6 @@ import React, { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
 import { NewsCarousel } from '../components/NewsCarousel';
-import { NewsCard } from '../components/NewsCard';
 import { mockNewsArticles } from '../data/newsData';
 
 export const Homepage: React.FC = () => {

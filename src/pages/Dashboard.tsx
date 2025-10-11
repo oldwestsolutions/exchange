@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp, ArrowUpRight, Zap, Shield, Target } from 'lucide-react';
+import { Search, TrendingUp } from 'lucide-react';
 import { NewsTicker } from '../components/NewsTicker';
 import { WatchlistCarousel } from '../components/WatchlistCarousel';
 import { StockSearchResults } from '../components/StockSearchResults';
@@ -39,11 +39,7 @@ export const Dashboard: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // Mock wallet data
-  const walletBalance = 127583.42;
-  const dailyChange = 2847.32;
-  const dailyChangePercent = 2.28;
-  const isPositive = dailyChange >= 0;
+  // Mock wallet data - ready for Interactive Brokers integration
 
   // Mock breaking news for ticker
   const breakingNews = [

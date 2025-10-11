@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, TrendingDown, Calendar, Users, MapPin, Globe, ExternalLink } from 'lucide-react';
 
 interface CompanyDetails {
@@ -49,7 +49,6 @@ interface OptionContract {
 }
 
 export const CompanyDetails: React.FC = () => {
-  const { symbol } = useParams<{ symbol: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'options'>('overview');
 

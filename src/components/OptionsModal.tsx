@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, TrendingUp, TrendingDown, Calendar, DollarSign, Activity, AlertTriangle } from 'lucide-react';
+import { X, TrendingUp, TrendingDown, DollarSign, Activity, AlertTriangle } from 'lucide-react';
 
 interface OptionsContract {
   id: number;
@@ -99,7 +99,6 @@ export const OptionsModal: React.FC<OptionsModalProps> = ({ contract, isOpen, on
   console.log('Modal rendering with contract:', contract);
 
   const isProfit = contract.return.startsWith('+');
-  const profitLoss = parseFloat(contract.return.replace(/[+%]/g, ''));
 
   // Calculate heat map color intensity
   const getHeatMapColor = (value: number) => {
