@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { LoginFormData } from '../types';
 
@@ -51,7 +51,17 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-3 sm:px-4 lg:px-8 pt-14 sm:pt-16 pb-8">
+    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+      {/* Logo Header */}
+      <div className="py-6 px-4">
+        <Link to="/" className="inline-block">
+          <span className="text-2xl font-serif font-bold text-white hover:text-blue-400 transition-colors">
+            Bridge Observer
+          </span>
+        </Link>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-3 sm:px-4 lg:px-8 py-8">
       <div className="max-w-md w-full">
         {/* Card Container */}
         <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg overflow-hidden">
@@ -61,7 +71,7 @@ export const Login: React.FC = () => {
               Welcome Back
             </h2>
             <p className="text-sm sm:text-base text-gray-400">
-              Sign in to BridgeObserver
+              Sign in to Bridge Observer
             </p>
           </div>
 
@@ -167,6 +177,16 @@ export const Login: React.FC = () => {
           Enter any email and password to sign in
         </p>
       </div>
+      </div>
+
+      {/* Minimal Footer */}
+      <footer className="border-t border-[#2a2a2a] bg-[#0a0a0a] py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center text-gray-500 text-sm">
+            © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LogIn, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface NavbarProps {
   searchQuery?: string;
@@ -76,14 +76,13 @@ export const Navbar: React.FC<NavbarProps> = ({ searchQuery = '', onSearchChange
           <div className="flex items-center">
             <Link
               to="/login"
-              className={`flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg transition-colors ${
+              className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-lg transition-colors font-medium ${
                 isActive('/login')
                   ? 'bg-blue-600 text-white'
                   : 'text-gray-300 hover:bg-[#2a2a2a] hover:text-white'
               }`}
             >
-              <LogIn size={16} className="sm:w-5 sm:h-5" />
-              <span className="text-xs sm:text-base">Login</span>
+              <span className="text-sm sm:text-base">Login</span>
             </Link>
           </div>
         </div>

@@ -12,10 +12,20 @@
     color-scheme: dark;
   }
   
-  html, body {
+  html {
     @apply bg-gray-50 dark:bg-[#0a0a0a];
     margin: 0;
     padding: 0;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-gray-50 dark:bg-[#0a0a0a];
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
   }
 
   #root {
@@ -103,5 +113,45 @@
 
 .animate-scroll:hover {
   animation-play-state: paused;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  /* Smooth touch scrolling */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Prevent zoom on input focus on iOS */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+button, a, input, textarea, select {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Optimize images for mobile */
+img {
+  max-width: 100%;
+  height: auto;
 }
 

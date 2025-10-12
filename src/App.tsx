@@ -3,26 +3,66 @@
  */
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Analytics } from '@vercel/analytics/react';
 import { ThemeProvider } from './context/ThemeContext';
-import { Navbar } from './components/Navbar';
 import { Homepage } from './pages/Homepage';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { CompanyDetails } from './pages/CompanyDetails';
+import { OurTeam } from './pages/OurTeam';
+import { Documentation } from './pages/Documentation';
+import { HelpCenter } from './pages/HelpCenter';
+import { Community } from './pages/Community';
+import { Features } from './pages/Features';
+import { Pricing } from './pages/Pricing';
+import { RequestAccess } from './pages/RequestAccess';
+
+// Page transition wrapper
+const PageTransition: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.3, ease: 'easeInOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+// Animated routes component
+const AnimatedRoutes: React.FC = () => {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Homepage /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+        <Route path="/request-access" element={<PageTransition><RequestAccess /></PageTransition>} />
+        <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+        <Route path="/company/:symbol" element={<PageTransition><CompanyDetails /></PageTransition>} />
+        <Route path="/our-team" element={<PageTransition><OurTeam /></PageTransition>} />
+        <Route path="/documentation" element={<PageTransition><Documentation /></PageTransition>} />
+        <Route path="/help-center" element={<PageTransition><HelpCenter /></PageTransition>} />
+        <Route path="/community" element={<PageTransition><Community /></PageTransition>} />
+        <Route path="/features" element={<PageTransition><Features /></PageTransition>} />
+        <Route path="/pricing" element={<PageTransition><Pricing /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 const App: React.FC = () => {
   return (
     <ThemeProvider>
       <Router>
         <div className="bg-gray-50 dark:bg-[#0a0a0a]">
-          {/* Route configuration */}
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/login" element={<><Navbar /><Login /></>} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/company/:symbol" element={<CompanyDetails />} />
-          </Routes>
+          <AnimatedRoutes />
+          <Analytics />
         </div>
       </Router>
     </ThemeProvider>
