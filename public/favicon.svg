@@ -2,31 +2,36 @@
   <!-- Background -->
   <rect width="64" height="64" fill="#0a0a0a" rx="12"/>
   
-  <!-- Outer coin circle with gradient effect -->
-  <circle cx="32" cy="32" r="20" fill="url(#coinGradient)" stroke="#fbbf24" stroke-width="2"/>
+  <!-- Bridge roadway -->
+  <line x1="8" y1="45" x2="56" y2="45" stroke="white" stroke-width="3" stroke-linecap="round"/>
   
-  <!-- Inner circle detail -->
-  <circle cx="32" cy="32" r="17" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
+  <!-- Left tower base -->
+  <rect x="16" y="35" width="6" height="10" fill="white"/>
   
-  <!-- Letter "B" for Bridge/Bitcoin style -->
-  <text x="32" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#0a0a0a" text-anchor="middle">B</text>
+  <!-- Right tower base -->
+  <rect x="42" y="35" width="6" height="10" fill="white"/>
   
-  <!-- Shine effect -->
-  <ellipse cx="26" cy="24" rx="4" ry="6" fill="#fef3c7" opacity="0.4" transform="rotate(-30 26 24)"/>
+  <!-- Left tower A-frame -->
+  <line x1="19" y1="25" x2="16" y2="35" stroke="white" stroke-width="2"/>
+  <line x1="19" y1="25" x2="22" y2="35" stroke="white" stroke-width="2"/>
+  <line x1="16" y1="35" x2="22" y2="35" stroke="white" stroke-width="2"/>
   
-  <!-- Small data points around coin -->
-  <circle cx="14" cy="20" r="1.5" fill="#3b82f6" opacity="0.6"/>
-  <circle cx="50" cy="22" r="1.5" fill="#3b82f6" opacity="0.6"/>
-  <circle cx="18" cy="44" r="1.5" fill="#3b82f6" opacity="0.6"/>
-  <circle cx="46" cy="44" r="1.5" fill="#3b82f6" opacity="0.6"/>
+  <!-- Right tower A-frame -->
+  <line x1="45" y1="25" x2="42" y2="35" stroke="white" stroke-width="2"/>
+  <line x1="45" y1="25" x2="48" y2="35" stroke="white" stroke-width="2"/>
+  <line x1="42" y1="35" x2="48" y2="35" stroke="white" stroke-width="2"/>
   
-  <!-- Gradient definition -->
-  <defs>
-    <radialGradient id="coinGradient" cx="40%" cy="40%">
-      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
-      <stop offset="70%" style="stop-color:#f59e0b;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
-    </radialGradient>
-  </defs>
+  <!-- Suspension cables from left tower -->
+  <path d="M 19 25 Q 25 30 32 45" stroke="white" stroke-width="1.5" fill="none"/>
+  <path d="M 19 25 Q 35 35 42 45" stroke="white" stroke-width="1.5" fill="none"/>
+  <path d="M 19 25 Q 45 40 56 45" stroke="white" stroke-width="1.5" fill="none"/>
+  
+  <!-- Suspension cables from right tower -->
+  <path d="M 45 25 Q 39 30 32 45" stroke="white" stroke-width="1.5" fill="none"/>
+  <path d="M 45 25 Q 29 35 22 45" stroke="white" stroke-width="1.5" fill="none"/>
+  <path d="M 45 25 Q 19 40 8 45" stroke="white" stroke-width="1.5" fill="none"/>
+  
+  <!-- Horizontal cable connecting towers -->
+  <line x1="19" y1="25" x2="45" y2="25" stroke="white" stroke-width="1.5"/>
 </svg>
 
