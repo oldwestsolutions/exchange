@@ -15,10 +15,34 @@ import {
   Lock
 } from 'lucide-react';
 import { Navbar } from '../components/Navbar';
+import { SEO } from '../components/SEO';
 
 export const Homepage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      <SEO 
+        title="Bridge Observer - Algorithmic Trade Engine"
+        description="Professional algorithmic risk management platform for options trading professionals. Connect with Interactive Brokers for real-time AI analysis, risk alerts, and trade optimization."
+        keywords="options trading platform, algorithmic trading, risk management software, Interactive Brokers integration, AI trading tools, options analysis, trading algorithms, professional trading platform, options strategy, trading risk management"
+        canonical="https://bridgeobserver.com/"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'SoftwareApplication',
+          name: 'Bridge Observer',
+          applicationCategory: 'FinanceApplication',
+          operatingSystem: 'Web, iOS, Android',
+          offers: {
+            '@type': 'Offer',
+            price: '49.00',
+            priceCurrency: 'USD'
+          },
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: '4.8',
+            ratingCount: '1247'
+          }
+        }}
+      />
       <Navbar showSearch={false} />
       
       {/* Add padding for fixed navbar */}

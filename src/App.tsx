@@ -6,6 +6,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Analytics } from '@vercel/analytics/react';
+import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from './context/ThemeContext';
 import { Homepage } from './pages/Homepage';
 import { Login } from './pages/Login';
@@ -58,14 +59,16 @@ const AnimatedRoutes: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <Router>
-        <div className="bg-gray-50 dark:bg-[#0a0a0a]">
-          <AnimatedRoutes />
-          <Analytics />
-        </div>
-      </Router>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider>
+        <Router>
+          <div className="bg-gray-50 dark:bg-[#0a0a0a]">
+            <AnimatedRoutes />
+            <Analytics />
+          </div>
+        </Router>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 };
 

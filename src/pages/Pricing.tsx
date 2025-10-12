@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
+import { SEO } from '../components/SEO';
 import { Check, X } from 'lucide-react';
 
 export const Pricing: React.FC = () => {
@@ -85,6 +86,40 @@ export const Pricing: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      <SEO 
+        title="Pricing Plans - Affordable Trading Solutions"
+        description="Transparent pricing for professional traders. Choose from Starter ($49/mo), Professional ($149/mo), or Enterprise ($499/mo) plans. 14-day free trial, no credit card required."
+        keywords="trading platform pricing, trading software cost, options trading subscription, professional trading plans, trading platform cost"
+        canonical="https://bridgeobserver.com/pricing"
+        structuredData={{
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: 'Bridge Observer Subscription',
+          offers: [
+            {
+              '@type': 'Offer',
+              name: 'Starter Plan',
+              price: '49.00',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock'
+            },
+            {
+              '@type': 'Offer',
+              name: 'Professional Plan',
+              price: '149.00',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock'
+            },
+            {
+              '@type': 'Offer',
+              name: 'Enterprise Plan',
+              price: '499.00',
+              priceCurrency: 'USD',
+              availability: 'https://schema.org/InStock'
+            }
+          ]
+        }}
+      />
       <Navbar showSearch={false} />
       
       <div className="pt-14 sm:pt-16">

@@ -5,6 +5,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
+import { SEO } from '../components/SEO';
 import { 
   Brain, 
   Shield, 
@@ -126,6 +127,12 @@ export const Features: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
+      <SEO 
+        title="Features - Professional Trading Tools"
+        description="Discover Bridge Observer's comprehensive features: AI-powered risk analysis, real-time alerts, near-term trade optimization, advanced analytics, and Interactive Brokers integration."
+        keywords="trading features, AI risk analysis, trading alerts, portfolio analytics, options trading tools, risk management features, trade optimization"
+        canonical="https://bridgeobserver.com/features"
+      />
       <Navbar showSearch={false} />
       
       <div className="pt-14 sm:pt-16">

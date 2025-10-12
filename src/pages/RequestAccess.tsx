@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, MessageSquare, User, Mail, CheckCircle } from 'lucide-react';
+import { SEO } from '../components/SEO';
 
 export const RequestAccess: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -84,6 +85,12 @@ export const RequestAccess: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+      <SEO 
+        title="Request Platform Access - Join Bridge Observer"
+        description="Request access to Bridge Observer's professional options trading platform. Connect with our team to start trading smarter with AI-powered risk management tools."
+        keywords="request trading platform access, join Bridge Observer, trading platform signup, professional trading account"
+        canonical="https://bridgeobserver.com/request-access"
+      />
       {/* Logo Header */}
       <div className="py-6 px-4">
         <Link to="/" className="inline-block">
