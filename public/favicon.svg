@@ -1,31 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- Bridge Background -->
+  <!-- Background -->
   <rect width="64" height="64" fill="#0a0a0a" rx="12"/>
   
-  <!-- Bridge Structure -->
-  <!-- Main arch/span -->
-  <path d="M 12 40 Q 32 25, 52 40" stroke="#3b82f6" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- Outer coin circle with gradient effect -->
+  <circle cx="32" cy="32" r="20" fill="url(#coinGradient)" stroke="#fbbf24" stroke-width="2"/>
   
-  <!-- Support cables/suspenders -->
-  <line x1="20" y1="32" x2="20" y2="40" stroke="#3b82f6" stroke-width="1.5" opacity="0.8"/>
-  <line x1="26" y1="29" x2="26" y2="40" stroke="#3b82f6" stroke-width="1.5" opacity="0.8"/>
-  <line x1="32" y1="27" x2="32" y2="40" stroke="#3b82f6" stroke-width="1.5" opacity="0.8"/>
-  <line x1="38" y1="29" x2="38" y2="40" stroke="#3b82f6" stroke-width="1.5" opacity="0.8"/>
-  <line x1="44" y1="32" x2="44" y2="40" stroke="#3b82f6" stroke-width="1.5" opacity="0.8"/>
+  <!-- Inner circle detail -->
+  <circle cx="32" cy="32" r="17" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
   
-  <!-- Road/deck -->
-  <rect x="10" y="38" width="44" height="4" fill="#3b82f6" rx="1"/>
+  <!-- Letter "B" for Bridge/Bitcoin style -->
+  <text x="32" y="40" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#0a0a0a" text-anchor="middle">B</text>
   
-  <!-- Support towers -->
-  <rect x="11" y="32" width="3" height="10" fill="#60a5fa" rx="1"/>
-  <rect x="50" y="32" width="3" height="10" fill="#60a5fa" rx="1"/>
+  <!-- Shine effect -->
+  <ellipse cx="26" cy="24" rx="4" ry="6" fill="#fef3c7" opacity="0.4" transform="rotate(-30 26 24)"/>
   
-  <!-- Data points/nodes (representing algorithmic/tech aspect) -->
-  <circle cx="20" cy="32" r="2" fill="#93c5fd"/>
-  <circle cx="32" cy="27" r="2" fill="#93c5fd"/>
-  <circle cx="44" cy="32" r="2" fill="#93c5fd"/>
+  <!-- Small data points around coin -->
+  <circle cx="14" cy="20" r="1.5" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="50" cy="22" r="1.5" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="18" cy="44" r="1.5" fill="#3b82f6" opacity="0.6"/>
+  <circle cx="46" cy="44" r="1.5" fill="#3b82f6" opacity="0.6"/>
   
-  <!-- Accent line representing data flow -->
-  <path d="M 15 48 L 25 45 L 35 46 L 45 44 L 52 46" stroke="#3b82f6" stroke-width="1.5" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <!-- Gradient definition -->
+  <defs>
+    <radialGradient id="coinGradient" cx="40%" cy="40%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+    </radialGradient>
+  </defs>
 </svg>
 
