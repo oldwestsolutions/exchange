@@ -1,203 +1,444 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, Check, AlertCircle, Search, TrendingUp, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Search, Filter, TrendingUp, BarChart3, Eye, DollarSign, Activity, Zap, Info } from 'lucide-react';
 
-interface StockScannerProps {
+interface OptionsScannerProps {
   onClose: () => void;
 }
 
-interface StockData {
-  symbol: string;
-  name: string;
-  price: number;
-  change: number;
-  changePercent: number;
-  volume: number;
-  marketCap: string;
-  sector: string;
+interface GreekRange {
+  min: number;
+  max: number;
+  mode: number;
 }
 
-export const StockScanner: React.FC<StockScannerProps> = ({ onClose }) => {
+interface GreekAnalytics {
+  delta: GreekRange;
+  gamma: GreekRange;
+  theta: GreekRange;
+  vega: GreekRange;
+  rho: GreekRange;
+}
+
+interface OptionsContract {
+  id: string;
+  symbol: string;
+  type: 'CALL' | 'PUT';
+  strike: number;
+  expiration: string;
+  bid: number;
+  ask: number;
+  last: number;
+  volume: number;
+  openInterest: number;
+  impliedVolatility: number;
+  delta: number;
+  gamma: number;
+  theta: number;
+  vega: number;
+  rho: number;
+  timeValue: number;
+  intrinsicValue: number;
+  totalValue: number;
+  return: string;
+  greeks: GreekAnalytics;
+  underlyingPrice: number;
+  timeToExpiration: number;
+}
+
+interface ScannerFilters {
+  symbol: string;
+  minPrice: string;
+  maxPrice: string;
+  minVolume: string;
+  minOpenInterest: string;
+  minDelta: string;
+  maxDelta: string;
+  minGamma: string;
+  maxGamma: string;
+  minTheta: string;
+  maxTheta: string;
+  minVega: string;
+  maxVega: string;
+  minIV: string;
+  maxIV: string;
+  contractType: 'ALL' | 'CALL' | 'PUT';
+  expirationRange: 'ALL' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY';
+}
+
+export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
   const [isScanning, setIsScanning] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [scanResult, setScanResult] = useState<StockData | null>(null);
+  const [results, setResults] = useState<OptionsContract[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const scanIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<ScannerFilters>({
+    symbol: '',
+    minPrice: '',
+    maxPrice: '',
+    minVolume: '100',
+    minOpenInterest: '50',
+    minDelta: '',
+    maxDelta: '',
+    minGamma: '',
+    maxGamma: '',
+    minTheta: '',
+    maxTheta: '',
+    minVega: '',
+    maxVega: '',
+    minIV: '',
+    maxIV: '',
+    contractType: 'ALL',
+    expirationRange: 'ALL'
+  });
 
-  // Mock stock data for demonstration
-  const mockStockData: { [key: string]: StockData } = {
-    'AAPL': {
-      symbol: 'AAPL',
-      name: 'Apple Inc.',
-      price: 189.95,
-      change: 2.45,
-      changePercent: 1.31,
-      volume: 45678900,
-      marketCap: '$2.9T',
-      sector: 'Technology'
-    },
-    'MSFT': {
-      symbol: 'MSFT',
-      name: 'Microsoft Corporation',
-      price: 378.85,
-      change: -1.25,
-      changePercent: -0.33,
-      volume: 23456700,
-      marketCap: '$2.8T',
-      sector: 'Technology'
-    },
-    'GOOGL': {
-      symbol: 'GOOGL',
-      name: 'Alphabet Inc.',
-      price: 142.56,
-      change: 3.21,
-      changePercent: 2.31,
-      volume: 12345600,
-      marketCap: '$1.8T',
-      sector: 'Technology'
-    },
-    'TSLA': {
-      symbol: 'TSLA',
-      name: 'Tesla, Inc.',
-      price: 248.50,
-      change: 12.75,
-      changePercent: 5.41,
-      volume: 67890100,
-      marketCap: '$789B',
-      sector: 'Automotive'
-    },
-    'NVDA': {
-      symbol: 'NVDA',
-      name: 'NVIDIA Corporation',
-      price: 875.28,
-      change: 45.32,
-      changePercent: 5.46,
-      volume: 34567800,
-      marketCap: '$2.1T',
-      sector: 'Technology'
-    },
-    'AMZN': {
-      symbol: 'AMZN',
-      name: 'Amazon.com Inc.',
-      price: 145.86,
-      change: -2.14,
-      changePercent: -1.45,
-      volume: 23456700,
-      marketCap: '$1.5T',
-      sector: 'Consumer Cyclical'
-    }
-  };
+  // Risk Engine: Calculate Greek ranges based on market variations
+  const calculateGreekRanges = (
+    modeDelta: number,
+    modeGamma: number,
+    modeTheta: number,
+    modeVega: number,
+    modeRho: number,
+    underlyingPrice: number,
+    strike: number,
+    timeToExpiration: number,
+    impliedVolatility: number,
+    type: 'CALL' | 'PUT'
+  ): GreekAnalytics => {
+    // Simulate price variations (±5%)
+    const priceVariations = [-0.05, -0.025, 0, 0.025, 0.05];
+    // Simulate volatility variations (±20%)
+    const volVariations = [-0.20, -0.10, 0, 0.10, 0.20];
+    // Simulate time decay (1 day, 1 week, current, 1 week forward)
+    const timeVariations = [-7, -1, 0, 1, 7];
 
-  // Initialize camera
-  useEffect(() => {
-    const initializeCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'environment',
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
+    const deltaValues: number[] = [];
+    const gammaValues: number[] = [];
+    const thetaValues: number[] = [];
+    const vegaValues: number[] = [];
+    const rhoValues: number[] = [];
+
+    // Calculate Greeks for all combinations
+    priceVariations.forEach(priceChange => {
+      volVariations.forEach(volChange => {
+        timeVariations.forEach(timeChange => {
+          const newPrice = underlyingPrice * (1 + priceChange);
+          const newVol = impliedVolatility * (1 + volChange);
+          const newTime = Math.max(0.01, timeToExpiration + timeChange / 365);
+
+          // Simplified Black-Scholes Greek calculations
+          const d1 = (Math.log(newPrice / strike) + (0.05 + 0.5 * newVol * newVol) * newTime) / (newVol * Math.sqrt(newTime));
+          const d2 = d1 - newVol * Math.sqrt(newTime);
+
+          // Delta calculation
+          const delta = type === 'CALL' ? 
+            (0.5 * (1 + erf(d1 / Math.sqrt(2)))) : 
+            (0.5 * (1 + erf(d1 / Math.sqrt(2))) - 1);
+          
+          // Gamma calculation
+          const gamma = Math.exp(-d1 * d1 / 2) / (newPrice * newVol * Math.sqrt(2 * Math.PI * newTime));
+          
+          // Theta calculation
+          const theta = -(newPrice * Math.exp(-d1 * d1 / 2) * newVol) / (2 * Math.sqrt(2 * Math.PI * newTime)) - 
+                       0.05 * strike * Math.exp(-0.05 * newTime) * (type === 'CALL' ? 
+                       (0.5 * (1 + erf(d2 / Math.sqrt(2)))) : 
+                       (0.5 * (1 + erf(d2 / Math.sqrt(2))) - 1));
+          
+          // Vega calculation
+          const vega = newPrice * Math.sqrt(newTime) * Math.exp(-d1 * d1 / 2) / Math.sqrt(2 * Math.PI) / 100;
+          
+          // Rho calculation
+          const rho = strike * newTime * Math.exp(-0.05 * newTime) * (type === 'CALL' ? 
+                     (0.5 * (1 + erf(d2 / Math.sqrt(2)))) : 
+                     (0.5 * (1 + erf(d2 / Math.sqrt(2))) - 1)) / 100;
+
+          deltaValues.push(delta);
+          gammaValues.push(gamma);
+          thetaValues.push(theta);
+          vegaValues.push(vega);
+          rhoValues.push(rho);
         });
-        
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          streamRef.current = stream;
-          setIsScanning(true);
-          setError(null);
-        }
-      } catch (err) {
-        console.error('Error accessing camera:', err);
-        setError('Unable to access camera. Please check permissions.');
-      }
-    };
+      });
+    });
 
-    initializeCamera();
+    // Helper function for error function approximation
+    function erf(x: number): number {
+      const a1 =  0.254829592;
+      const a2 = -0.284496736;
+      const a3 =  1.421413741;
+      const a4 = -1.453152027;
+      const a5 =  1.061405429;
+      const p  =  0.3275911;
 
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-      if (scanIntervalRef.current) {
-        clearInterval(scanIntervalRef.current);
-      }
-    };
-  }, []);
+      const sign = x < 0 ? -1 : 1;
+      x = Math.abs(x);
 
-  // Simulate stock scanning
-  useEffect(() => {
-    if (!isScanning || !videoRef.current || !canvasRef.current) return;
+      const t = 1.0 / (1.0 + p * x);
+      const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
-    const scanForStocks = () => {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      if (!video || !canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      ctx.drawImage(video, 0, 0);
-
-      // Simulate stock symbol detection
-      if (Math.random() < 0.008) { // 0.8% chance per scan
-        const symbols = Object.keys(mockStockData);
-        const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
-        const stockData = mockStockData[randomSymbol];
-        
-        setScanResult(stockData);
-        setIsScanning(false);
-        setIsLoading(true);
-        
-        // Simulate API call delay
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
-      }
-    };
-
-    scanIntervalRef.current = setInterval(scanForStocks, 100);
-  }, [isScanning]);
-
-  const handleManualInput = () => {
-    const input = prompt('Enter stock symbol (e.g., AAPL, MSFT, TSLA):');
-    if (input && input.trim()) {
-      const symbol = input.trim().toUpperCase();
-      const stockData = mockStockData[symbol];
-      
-      if (stockData) {
-        setScanResult(stockData);
-        setIsScanning(false);
-        setIsLoading(true);
-        
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 1500);
-      } else {
-        alert(`Stock symbol "${symbol}" not found in our database.`);
-      }
+      return sign * y;
     }
+
+    return {
+      delta: {
+        mode: modeDelta,
+        min: Math.min(...deltaValues),
+        max: Math.max(...deltaValues)
+      },
+      gamma: {
+        mode: modeGamma,
+        min: Math.min(...gammaValues),
+        max: Math.max(...gammaValues)
+      },
+      theta: {
+        mode: modeTheta,
+        min: Math.min(...thetaValues),
+        max: Math.max(...thetaValues)
+      },
+      vega: {
+        mode: modeVega,
+        min: Math.min(...vegaValues),
+        max: Math.max(...vegaValues)
+      },
+      rho: {
+        mode: modeRho,
+        min: Math.min(...rhoValues),
+        max: Math.max(...rhoValues)
+      }
+    };
   };
 
-  const handleAddToWatchlist = () => {
-    if (scanResult) {
-      // In a real app, this would add to watchlist
-      console.log('Adding to watchlist:', scanResult.symbol);
-      alert(`${scanResult.symbol} added to watchlist!`);
-    }
+  // Helper function to create contract with Greek analytics
+  const createContract = (
+    id: string,
+    symbol: string,
+    type: 'CALL' | 'PUT',
+    strike: number,
+    expiration: string,
+    bid: number,
+    ask: number,
+    last: number,
+    volume: number,
+    openInterest: number,
+    impliedVolatility: number,
+    delta: number,
+    gamma: number,
+    theta: number,
+    vega: number,
+    rho: number,
+    timeValue: number,
+    intrinsicValue: number,
+    totalValue: number,
+    return: string,
+    underlyingPrice: number,
+    timeToExpiration: number
+  ): OptionsContract => ({
+    id,
+    symbol,
+    type,
+    strike,
+    expiration,
+    bid,
+    ask,
+    last,
+    volume,
+    openInterest,
+    impliedVolatility,
+    delta,
+    gamma,
+    theta,
+    vega,
+    rho,
+    timeValue,
+    intrinsicValue,
+    totalValue,
+    return,
+    underlyingPrice,
+    timeToExpiration,
+    greeks: calculateGreekRanges(delta, gamma, theta, vega, rho, underlyingPrice, strike, timeToExpiration, impliedVolatility, type)
+  });
+
+  // Mock options contracts data with Greek analytics
+  const mockOptionsContracts: OptionsContract[] = [
+    createContract('1', 'AAPL', 'CALL', 190, '2025-01-17', 5.25, 5.35, 5.30, 1250, 8920, 0.28, 0.65, 0.012, -0.08, 0.15, 0.05, 5.30, 0, 530, '+18.2%', 189.95, 0.15),
+    createContract('2', 'TSLA', 'PUT', 250, '2025-01-20', 8.70, 8.80, 8.75, 890, 5430, 0.32, -0.45, 0.008, -0.12, 0.22, -0.03, 8.75, 0, 875, '+24.8%', 248.50, 0.18),
+    createContract('3', 'NVDA', 'CALL', 900, '2025-01-17', 12.25, 12.35, 12.30, 2100, 12560, 0.35, 0.72, 0.006, -0.15, 0.18, 0.08, 12.30, 0, 1230, '+35.7%', 875.28, 0.15),
+    createContract('4', 'MSFT', 'CALL', 380, '2025-01-24', 6.80, 6.90, 6.85, 680, 4560, 0.26, 0.58, 0.010, -0.09, 0.14, 0.06, 6.85, 0, 685, '+15.4%', 378.85, 0.22),
+    createContract('5', 'AMZN', 'PUT', 140, '2025-01-17', 4.15, 4.25, 4.20, 320, 2890, 0.30, -0.35, 0.015, -0.06, 0.12, -0.02, 4.20, 0, 420, '-5.3%', 145.86, 0.15),
+    createContract('6', 'GOOGL', 'CALL', 145, '2025-01-17', 7.55, 7.65, 7.60, 1450, 8920, 0.33, 0.68, 0.011, -0.11, 0.16, 0.07, 7.60, 0, 760, '+28.9%', 142.56, 0.15),
+    createContract('7', 'SPY', 'CALL', 450, '2025-01-17', 3.25, 3.35, 3.30, 3450, 15620, 0.22, 0.55, 0.008, -0.05, 0.10, 0.04, 3.30, 0, 330, '+12.1%', 445.50, 0.15),
+    createContract('8', 'QQQ', 'PUT', 380, '2025-01-20', 2.80, 2.90, 2.85, 2100, 7890, 0.25, -0.42, 0.009, -0.07, 0.11, -0.03, 2.85, 0, 285, '+8.7%', 375.20, 0.18)
+  ];
+
+  // Filter options contracts based on criteria
+  const filterContracts = (contracts: OptionsContract[], filters: ScannerFilters): OptionsContract[] => {
+    return contracts.filter(contract => {
+      // Symbol filter
+      if (filters.symbol && !contract.symbol.toLowerCase().includes(filters.symbol.toLowerCase())) {
+        return false;
+      }
+
+      // Price filters
+      if (filters.minPrice && contract.last < parseFloat(filters.minPrice)) {
+        return false;
+      }
+      if (filters.maxPrice && contract.last > parseFloat(filters.maxPrice)) {
+        return false;
+      }
+
+      // Volume filter
+      if (filters.minVolume && contract.volume < parseInt(filters.minVolume)) {
+        return false;
+      }
+
+      // Open Interest filter
+      if (filters.minOpenInterest && contract.openInterest < parseInt(filters.minOpenInterest)) {
+        return false;
+      }
+
+      // Delta filters
+      if (filters.minDelta && contract.delta < parseFloat(filters.minDelta)) {
+        return false;
+      }
+      if (filters.maxDelta && contract.delta > parseFloat(filters.maxDelta)) {
+        return false;
+      }
+
+      // Gamma filters
+      if (filters.minGamma && contract.gamma < parseFloat(filters.minGamma)) {
+        return false;
+      }
+      if (filters.maxGamma && contract.gamma > parseFloat(filters.maxGamma)) {
+        return false;
+      }
+
+      // Theta filters
+      if (filters.minTheta && contract.theta < parseFloat(filters.minTheta)) {
+        return false;
+      }
+      if (filters.maxTheta && contract.theta > parseFloat(filters.maxTheta)) {
+        return false;
+      }
+
+      // Vega filters
+      if (filters.minVega && contract.vega < parseFloat(filters.minVega)) {
+        return false;
+      }
+      if (filters.maxVega && contract.vega > parseFloat(filters.maxVega)) {
+        return false;
+      }
+
+      // IV filters
+      if (filters.minIV && contract.impliedVolatility < parseFloat(filters.minIV)) {
+        return false;
+      }
+      if (filters.maxIV && contract.impliedVolatility > parseFloat(filters.maxIV)) {
+        return false;
+      }
+
+      // Contract type filter
+      if (filters.contractType !== 'ALL' && contract.type !== filters.contractType) {
+        return false;
+      }
+
+      return true;
+    });
+  };
+
+  // Scan for options contracts
+  const handleScan = () => {
+    setIsLoading(true);
+    setIsScanning(true);
+
+    // Simulate API call delay
+    setTimeout(() => {
+      const filteredResults = filterContracts(mockOptionsContracts, filters);
+      setResults(filteredResults);
+      setIsLoading(false);
+      setIsScanning(false);
+    }, 1500);
+  };
+
+  // Update filter
+  const updateFilter = (key: keyof ScannerFilters, value: string) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value
+    }));
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      symbol: '',
+      minPrice: '',
+      maxPrice: '',
+      minVolume: '100',
+      minOpenInterest: '50',
+      minDelta: '',
+      maxDelta: '',
+      minGamma: '',
+      maxGamma: '',
+      minTheta: '',
+      maxTheta: '',
+      minVega: '',
+      maxVega: '',
+      minIV: '',
+      maxIV: '',
+      contractType: 'ALL',
+      expirationRange: 'ALL'
+    });
+  };
+
+  // Greek Range Display Component
+  const GreekRangeDisplay: React.FC<{ 
+    greek: GreekRange; 
+    label: string; 
+    formatValue: (value: number) => string;
+    color: string;
+  }> = ({ greek, label, formatValue, color }) => {
+    const range = greek.max - greek.min;
+    const modePosition = range > 0 ? ((greek.mode - greek.min) / range) * 100 : 50;
+    
+    return (
+      <div className="space-y-1">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-gray-400">{label}</span>
+          <div className="flex items-center gap-1">
+            <span className="text-white font-medium">{formatValue(greek.mode)}</span>
+            <div className="group relative">
+              <Info className="h-3 w-3 text-gray-500 cursor-help" />
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                Mode: {formatValue(greek.mode)}<br/>
+                Range: {formatValue(greek.min)} - {formatValue(greek.max)}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
+          <div 
+            className={`h-full ${color} opacity-30`}
+            style={{ width: '100%' }}
+          />
+          <div 
+            className={`absolute top-0 h-full w-1 ${color} opacity-80`}
+            style={{ left: `${Math.max(0, Math.min(100, modePosition))}%` }}
+          />
+        </div>
+        <div className="flex justify-between text-xs text-gray-500">
+          <span>{formatValue(greek.min)}</span>
+          <span>{formatValue(greek.max)}</span>
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1a1a] rounded-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-[#1a1a1a] rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a]">
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-blue-500" />
-            <h3 className="text-lg font-semibold text-white">Stock Scanner</h3>
+            <Eye className="h-5 w-5 text-green-500" />
+            <h3 className="text-lg font-semibold text-white">Options Scanner</h3>
           </div>
           <button
             onClick={onClose}
@@ -207,134 +448,369 @@ export const StockScanner: React.FC<StockScannerProps> = ({ onClose }) => {
           </button>
         </div>
 
-        {/* Scanner Content */}
-        <div className="p-4">
-          {error ? (
-            <div className="text-center py-8">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <p className="text-red-400 mb-4">{error}</p>
-              <button
-                onClick={handleManualInput}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Enter Symbol Manually
-              </button>
-            </div>
-          ) : isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-white text-lg font-semibold mb-2">Analyzing Stock...</p>
-              <p className="text-gray-400 text-sm">Fetching real-time data</p>
-            </div>
-          ) : scanResult ? (
-            <div className="space-y-4">
-              <div className="text-center">
-                <Check className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <p className="text-white text-lg font-semibold mb-2">Stock Found!</p>
-              </div>
-              
-              {/* Stock Information */}
-              <div className="bg-[#0f0f0f] rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xl font-bold text-white">{scanResult.symbol}</h4>
-                    <p className="text-gray-400 text-sm">{scanResult.name}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-white">${scanResult.price.toFixed(2)}</p>
-                    <p className={`text-sm font-medium ${
-                      scanResult.change >= 0 ? 'text-green-500' : 'text-red-500'
-                    }`}>
-                      {scanResult.change >= 0 ? '+' : ''}{scanResult.change.toFixed(2)} ({scanResult.changePercent >= 0 ? '+' : ''}{scanResult.changePercent.toFixed(2)}%)
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 pt-3 border-t border-[#2a2a2a]">
-                  <div>
-                    <p className="text-gray-400 text-xs">Volume</p>
-                    <p className="text-white font-medium">{scanResult.volume.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400 text-xs">Market Cap</p>
-                    <p className="text-white font-medium">{scanResult.marketCap}</p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-gray-400 text-xs">Sector</p>
-                    <p className="text-white font-medium">{scanResult.sector}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-3">
+        <div className="flex h-[calc(90vh-80px)]">
+          {/* Filters Sidebar */}
+          <div className="w-80 border-r border-[#2a2a2a] bg-[#0f0f0f] overflow-y-auto">
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-white font-semibold">Scan Filters</h4>
                 <button
-                  onClick={handleAddToWatchlist}
-                  className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="p-1 hover:bg-[#2a2a2a] rounded transition-colors"
                 >
-                  <TrendingUp className="h-4 w-4" />
-                  Add to Watchlist
-                </button>
-                <button
-                  onClick={() => {
-                    setScanResult(null);
-                    setIsScanning(true);
-                  }}
-                  className="flex-1 py-3 bg-[#2a2a2a] text-white rounded-lg hover:bg-[#3a3a3a] transition-colors flex items-center justify-center gap-2"
-                >
-                  <Camera className="h-4 w-4" />
-                  Scan Again
+                  <Filter className="h-4 w-4 text-gray-400" />
                 </button>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {/* Camera View */}
-              <div className="relative bg-black rounded-lg overflow-hidden aspect-video">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover"
-                />
-                <canvas
-                  ref={canvasRef}
-                  className="hidden"
-                />
-                
-                {/* Scanning Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-48 h-48 border-2 border-blue-500 rounded-lg relative">
-                    <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-blue-500"></div>
-                    <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-blue-500"></div>
-                    <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-blue-500"></div>
-                    <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-blue-500"></div>
-                    
-                    {/* Scanning Line */}
-                    <div className="absolute inset-x-0 top-1/2 h-0.5 bg-blue-500 animate-pulse"></div>
+
+              <div className="space-y-4">
+                {/* Symbol Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Symbol</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., AAPL, TSLA"
+                    value={filters.symbol}
+                    onChange={(e) => updateFilter('symbol', e.target.value)}
+                    className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* Price Range */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Min Price</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={filters.minPrice}
+                      onChange={(e) => updateFilter('minPrice', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Max Price</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="100.00"
+                      value={filters.maxPrice}
+                      onChange={(e) => updateFilter('maxPrice', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
                   </div>
                 </div>
-              </div>
 
-              {/* Instructions */}
-              <div className="text-center space-y-2">
-                <p className="text-white font-medium">Point camera at stock symbol or QR code</p>
-                <p className="text-gray-400 text-sm">
-                  Scanning for stock symbols, tickers, or financial QR codes
-                </p>
-              </div>
+                {/* Volume & Open Interest */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Min Volume</label>
+                    <input
+                      type="number"
+                      placeholder="100"
+                      value={filters.minVolume}
+                      onChange={(e) => updateFilter('minVolume', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Min OI</label>
+                    <input
+                      type="number"
+                      placeholder="50"
+                      value={filters.minOpenInterest}
+                      onChange={(e) => updateFilter('minOpenInterest', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
 
-              {/* Manual Input Button */}
-              <button
-                onClick={handleManualInput}
-                className="w-full py-3 bg-[#2a2a2a] text-white rounded-lg hover:bg-[#3a3a3a] transition-colors flex items-center justify-center gap-2"
-              >
-                <Search className="h-4 w-4" />
-                Enter Symbol Manually
-              </button>
+                {/* Greeks - Delta */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    Delta Range
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="-1.0"
+                      value={filters.minDelta}
+                      onChange={(e) => updateFilter('minDelta', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="1.0"
+                      value={filters.maxDelta}
+                      onChange={(e) => updateFilter('maxDelta', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Greeks - Gamma */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Gamma Range</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      step="0.001"
+                      placeholder="0.000"
+                      value={filters.minGamma}
+                      onChange={(e) => updateFilter('minGamma', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      step="0.001"
+                      placeholder="0.100"
+                      value={filters.maxGamma}
+                      onChange={(e) => updateFilter('maxGamma', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Greeks - Theta */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Theta Range</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="-1.0"
+                      value={filters.minTheta}
+                      onChange={(e) => updateFilter('minTheta', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.0"
+                      value={filters.maxTheta}
+                      onChange={(e) => updateFilter('maxTheta', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Greeks - Vega */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Vega Range</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={filters.minVega}
+                      onChange={(e) => updateFilter('minVega', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="1.00"
+                      value={filters.maxVega}
+                      onChange={(e) => updateFilter('maxVega', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* IV Range */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">IV Range</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="0.10"
+                      value={filters.minIV}
+                      onChange={(e) => updateFilter('minIV', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                    <input
+                      type="number"
+                      step="0.01"
+                      placeholder="1.00"
+                      value={filters.maxIV}
+                      onChange={(e) => updateFilter('maxIV', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Contract Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Contract Type</label>
+                  <select
+                    value={filters.contractType}
+                    onChange={(e) => updateFilter('contractType', e.target.value)}
+                    className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="ALL">All Contracts</option>
+                    <option value="CALL">Calls Only</option>
+                    <option value="PUT">Puts Only</option>
+                  </select>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-4">
+                  <button
+                    onClick={handleScan}
+                    disabled={isLoading}
+                    className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                  >
+                    {isLoading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                    {isLoading ? 'Scanning...' : 'Scan Options'}
+                  </button>
+                  <button
+                    onClick={clearFilters}
+                    className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Results Panel */}
+          <div className="flex-1 overflow-y-auto">
+            <div className="p-4">
+              {isLoading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+                    <p className="text-white text-lg font-semibold">Scanning Options...</p>
+                    <p className="text-gray-400 text-sm">Filtering contracts based on your criteria</p>
+                  </div>
+                </div>
+              ) : results.length > 0 ? (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-white font-semibold">Found {results.length} Contracts</h4>
+                    <div className="text-sm text-gray-400">
+                      Last updated: {new Date().toLocaleTimeString()}
+                    </div>
+                  </div>
+                  
+                  <div className="grid gap-3">
+                    {results.map((contract) => (
+                      <div
+                        key={contract.id}
+                        className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4 hover:border-green-500/50 transition-colors"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-bold text-white">{contract.symbol}</span>
+                              <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                contract.type === 'CALL' 
+                                  ? 'bg-green-500/20 text-green-400' 
+                                  : 'bg-red-500/20 text-red-400'
+                              }`}>
+                                {contract.type}
+                              </span>
+                            </div>
+                            <div className="text-sm text-gray-400">
+                              ${contract.strike} • {new Date(contract.expiration).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-white">${contract.last.toFixed(2)}</div>
+                            <div className="text-sm text-gray-400">
+                              {contract.bid.toFixed(2)} / {contract.ask.toFixed(2)}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <div className="text-gray-400">Volume</div>
+                            <div className="text-white font-medium">{contract.volume.toLocaleString()}</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-400">OI</div>
+                            <div className="text-white font-medium">{contract.openInterest.toLocaleString()}</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-400">IV</div>
+                            <div className="text-white font-medium">{(contract.impliedVolatility * 100).toFixed(1)}%</div>
+                          </div>
+                          <div>
+                            <div className="text-gray-400">Return</div>
+                            <div className={`font-medium ${
+                              contract.return.startsWith('+') ? 'text-green-500' : 'text-red-500'
+                            }`}>
+                              {contract.return}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Greek Analytics Section */}
+                        <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Zap className="h-4 w-4 text-blue-500" />
+                            <h5 className="text-white font-medium text-sm">Greek Analytics</h5>
+                            <div className="group relative">
+                              <Info className="h-3 w-3 text-gray-500 cursor-help" />
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                Mode: Current value<br/>
+                                Range: Min-Max over ±5% price, ±20% vol variations
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <GreekRangeDisplay
+                              greek={contract.greeks.delta}
+                              label="Delta"
+                              formatValue={(value) => value.toFixed(3)}
+                              color="bg-blue-500"
+                            />
+                            <GreekRangeDisplay
+                              greek={contract.greeks.gamma}
+                              label="Gamma"
+                              formatValue={(value) => value.toFixed(4)}
+                              color="bg-purple-500"
+                            />
+                            <GreekRangeDisplay
+                              greek={contract.greeks.theta}
+                              label="Theta"
+                              formatValue={(value) => value.toFixed(3)}
+                              color="bg-red-500"
+                            />
+                            <GreekRangeDisplay
+                              greek={contract.greeks.vega}
+                              label="Vega"
+                              formatValue={(value) => value.toFixed(3)}
+                              color="bg-green-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-center">
+                    <Eye className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                    <p className="text-white text-lg font-semibold mb-2">No Contracts Found</p>
+                    <p className="text-gray-400 text-sm">Adjust your filters and try scanning again</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -3,13 +3,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp, Camera } from 'lucide-react';
+import { Search, TrendingUp, Eye } from 'lucide-react';
 import { NewsTicker } from '../components/NewsTicker';
 import { WatchlistCarousel } from '../components/WatchlistCarousel';
 import { StockSearchResults } from '../components/StockSearchResults';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { OptionsModal } from '../components/OptionsModal';
-import { StockScanner } from '../components/Scanner';
+import { OptionsScanner } from '../components/Scanner';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -191,14 +191,14 @@ export const Dashboard: React.FC = () => {
               {searchQuery && <StockSearchResults query={searchQuery} />}
             </div>
             
-            {/* Stock Scanner Button - Far Right */}
+            {/* Options Scanner Button - Far Right */}
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 min-w-[44px] sm:min-w-[120px] shadow-lg"
-              title="Stock Scanner - Scan QR codes and symbols"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 min-w-[44px] sm:min-w-[140px] shadow-lg"
+              title="Options Scanner - Find contracts by price, Greeks, and volume"
             >
-              <Camera className="h-4 sm:h-5 w-4 sm:w-5" />
-              <span className="hidden sm:inline text-sm font-medium">Stock Scanner</span>
+              <Eye className="h-4 sm:h-5 w-4 sm:w-5" />
+              <span className="hidden sm:inline text-sm font-medium">Options Scanner</span>
             </button>
           </div>
         </div>
@@ -307,9 +307,9 @@ export const Dashboard: React.FC = () => {
         }}
       />
 
-      {/* Stock Scanner Modal */}
+      {/* Options Scanner Modal */}
       {isScannerOpen && (
-        <StockScanner
+        <OptionsScanner
           onClose={handleScannerClose}
         />
       )}
