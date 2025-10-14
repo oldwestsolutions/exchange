@@ -392,7 +392,10 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
   const ScannerHeatMap: React.FC<{
     filters: ScannerFilters;
     onFilterChange: (key: keyof ScannerFilters, value: string) => void;
-  }> = ({ filters, onFilterChange }) => {
+    onScan: () => void;
+    onClear: () => void;
+    isLoading: boolean;
+  }> = ({ filters, onFilterChange, onScan, onClear, isLoading }) => {
     const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
     
     // Define heat map parameters
@@ -544,6 +547,28 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
             />
           </div>
         )}
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={onScan}
+            disabled={isLoading}
+            className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+            {isLoading ? 'Scanning...' : 'Scan Options'}
+          </button>
+          <button
+            onClick={onClear}
+            className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+          >
+            Clear
+          </button>
+        </div>
       </div>
     );
   };
@@ -615,6 +640,9 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
               <ScannerHeatMap
                 filters={filters}
                 onFilterChange={updateFilter}
+                onScan={handleScan}
+                onClear={clearFilters}
+                isLoading={isLoading}
               />
             </div>
           </div>
@@ -622,28 +650,6 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
           {/* Results Panel */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-4">
-              {/* Action Buttons */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={handleScan}
-                  disabled={isLoading}
-                  className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  ) : (
-                    <Search className="h-4 w-4" />
-                  )}
-                  {isLoading ? 'Scanning...' : 'Scan Options'}
-                </button>
-                <button
-                  onClick={clearFilters}
-                  className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-                >
-                  Clear
-                </button>
-              </div>
-
               {isLoading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
@@ -763,8 +769,8 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
                     <Eye className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <p className="text-white text-lg font-semibold mb-2">No Contracts Found</p>
-                    <p className="text-gray-400 text-sm">Adjust your filters and try scanning again</p>
+                    <p className="text-white text-lg font-semibold mb-2">Ready to Scan</p>
+                    <p className="text-gray-400 text-sm">Configure your parameters and scan for options</p>
                   </div>
                 </div>
               )}
