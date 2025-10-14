@@ -1,19 +1,94 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, Check, AlertCircle } from 'lucide-react';
+import { Camera, X, Check, AlertCircle, Search, TrendingUp, BarChart3 } from 'lucide-react';
 
-interface ScannerProps {
-  onScan: (result: string) => void;
+interface StockScannerProps {
   onClose: () => void;
 }
 
-export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
+interface StockData {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: number;
+  marketCap: string;
+  sector: string;
+}
+
+export const StockScanner: React.FC<StockScannerProps> = ({ onClose }) => {
   const [isScanning, setIsScanning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [scanResult, setScanResult] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<StockData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Mock stock data for demonstration
+  const mockStockData: { [key: string]: StockData } = {
+    'AAPL': {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      price: 189.95,
+      change: 2.45,
+      changePercent: 1.31,
+      volume: 45678900,
+      marketCap: '$2.9T',
+      sector: 'Technology'
+    },
+    'MSFT': {
+      symbol: 'MSFT',
+      name: 'Microsoft Corporation',
+      price: 378.85,
+      change: -1.25,
+      changePercent: -0.33,
+      volume: 23456700,
+      marketCap: '$2.8T',
+      sector: 'Technology'
+    },
+    'GOOGL': {
+      symbol: 'GOOGL',
+      name: 'Alphabet Inc.',
+      price: 142.56,
+      change: 3.21,
+      changePercent: 2.31,
+      volume: 12345600,
+      marketCap: '$1.8T',
+      sector: 'Technology'
+    },
+    'TSLA': {
+      symbol: 'TSLA',
+      name: 'Tesla, Inc.',
+      price: 248.50,
+      change: 12.75,
+      changePercent: 5.41,
+      volume: 67890100,
+      marketCap: '$789B',
+      sector: 'Automotive'
+    },
+    'NVDA': {
+      symbol: 'NVDA',
+      name: 'NVIDIA Corporation',
+      price: 875.28,
+      change: 45.32,
+      changePercent: 5.46,
+      volume: 34567800,
+      marketCap: '$2.1T',
+      sector: 'Technology'
+    },
+    'AMZN': {
+      symbol: 'AMZN',
+      name: 'Amazon.com Inc.',
+      price: 145.86,
+      change: -2.14,
+      changePercent: -1.45,
+      volume: 23456700,
+      marketCap: '$1.5T',
+      sector: 'Consumer Cyclical'
+    }
+  };
 
   // Initialize camera
   useEffect(() => {
@@ -21,7 +96,7 @@ export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: 'environment', // Use back camera on mobile
+            facingMode: 'environment',
             width: { ideal: 1280 },
             height: { ideal: 720 }
           }
@@ -51,11 +126,11 @@ export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
     };
   }, []);
 
-  // Simple barcode/QR code detection simulation
+  // Simulate stock scanning
   useEffect(() => {
     if (!isScanning || !videoRef.current || !canvasRef.current) return;
 
-    const scanForCodes = () => {
+    const scanForStocks = () => {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       if (!video || !canvas) return;
@@ -67,49 +142,63 @@ export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0);
 
-      // Simulate scanning by checking for patterns
-      // In a real implementation, you'd use a library like jsQR or QuaggaJS
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      
-      // Simple pattern detection simulation
-      if (Math.random() < 0.01) { // 1% chance per scan
-        const mockResults = [
-          'AAPL', 'MSFT', 'GOOGL', 'TSLA', 'NVDA', 'AMZN', 'META', 'NFLX',
-          'SPY', 'QQQ', 'IWM', 'VTI', 'ARKK', 'TQQQ', 'SQQQ',
-          'https://example.com/stock/AAPL',
-          'STOCK:AAPL:180:2025-12-15',
-          '{"symbol":"AAPL","strike":180,"expiry":"2025-12-15"}'
-        ];
+      // Simulate stock symbol detection
+      if (Math.random() < 0.008) { // 0.8% chance per scan
+        const symbols = Object.keys(mockStockData);
+        const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+        const stockData = mockStockData[randomSymbol];
         
-        const result = mockResults[Math.floor(Math.random() * mockResults.length)];
-        setScanResult(result);
+        setScanResult(stockData);
         setIsScanning(false);
+        setIsLoading(true);
         
-        // Auto-close after 2 seconds
+        // Simulate API call delay
         setTimeout(() => {
-          onScan(result);
-          onClose();
-        }, 2000);
+          setIsLoading(false);
+        }, 1500);
       }
     };
 
-    scanIntervalRef.current = setInterval(scanForCodes, 100);
-  }, [isScanning, onScan, onClose]);
+    scanIntervalRef.current = setInterval(scanForStocks, 100);
+  }, [isScanning]);
 
   const handleManualInput = () => {
-    const input = prompt('Enter stock symbol or scan result:');
+    const input = prompt('Enter stock symbol (e.g., AAPL, MSFT, TSLA):');
     if (input && input.trim()) {
-      onScan(input.trim().toUpperCase());
-      onClose();
+      const symbol = input.trim().toUpperCase();
+      const stockData = mockStockData[symbol];
+      
+      if (stockData) {
+        setScanResult(stockData);
+        setIsScanning(false);
+        setIsLoading(true);
+        
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 1500);
+      } else {
+        alert(`Stock symbol "${symbol}" not found in our database.`);
+      }
+    }
+  };
+
+  const handleAddToWatchlist = () => {
+    if (scanResult) {
+      // In a real app, this would add to watchlist
+      console.log('Adding to watchlist:', scanResult.symbol);
+      alert(`${scanResult.symbol} added to watchlist!`);
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1a1a] rounded-2xl max-w-md w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-[#1a1a1a] rounded-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a]">
-          <h3 className="text-lg font-semibold text-white">Scanner</h3>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-blue-500" />
+            <h3 className="text-lg font-semibold text-white">Stock Scanner</h3>
+          </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-[#2a2a2a] rounded-lg transition-colors"
@@ -128,17 +217,75 @@ export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
                 onClick={handleManualInput}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Enter Manually
+                Enter Symbol Manually
               </button>
             </div>
-          ) : scanResult ? (
+          ) : isLoading ? (
             <div className="text-center py-8">
-              <Check className="h-12 w-12 text-green-500 mx-auto mb-4" />
-              <p className="text-white text-lg font-semibold mb-2">Scanned Successfully!</p>
-              <p className="text-blue-400 font-mono text-sm bg-[#0f0f0f] p-3 rounded-lg">
-                {scanResult}
-              </p>
-              <p className="text-gray-400 text-sm mt-4">Processing...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-white text-lg font-semibold mb-2">Analyzing Stock...</p>
+              <p className="text-gray-400 text-sm">Fetching real-time data</p>
+            </div>
+          ) : scanResult ? (
+            <div className="space-y-4">
+              <div className="text-center">
+                <Check className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                <p className="text-white text-lg font-semibold mb-2">Stock Found!</p>
+              </div>
+              
+              {/* Stock Information */}
+              <div className="bg-[#0f0f0f] rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xl font-bold text-white">{scanResult.symbol}</h4>
+                    <p className="text-gray-400 text-sm">{scanResult.name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-white">${scanResult.price.toFixed(2)}</p>
+                    <p className={`text-sm font-medium ${
+                      scanResult.change >= 0 ? 'text-green-500' : 'text-red-500'
+                    }`}>
+                      {scanResult.change >= 0 ? '+' : ''}{scanResult.change.toFixed(2)} ({scanResult.changePercent >= 0 ? '+' : ''}{scanResult.changePercent.toFixed(2)}%)
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 pt-3 border-t border-[#2a2a2a]">
+                  <div>
+                    <p className="text-gray-400 text-xs">Volume</p>
+                    <p className="text-white font-medium">{scanResult.volume.toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-xs">Market Cap</p>
+                    <p className="text-white font-medium">{scanResult.marketCap}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-gray-400 text-xs">Sector</p>
+                    <p className="text-white font-medium">{scanResult.sector}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToWatchlist}
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <TrendingUp className="h-4 w-4" />
+                  Add to Watchlist
+                </button>
+                <button
+                  onClick={() => {
+                    setScanResult(null);
+                    setIsScanning(true);
+                  }}
+                  className="flex-1 py-3 bg-[#2a2a2a] text-white rounded-lg hover:bg-[#3a3a3a] transition-colors flex items-center justify-center gap-2"
+                >
+                  <Camera className="h-4 w-4" />
+                  Scan Again
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -172,9 +319,9 @@ export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
 
               {/* Instructions */}
               <div className="text-center space-y-2">
-                <p className="text-white font-medium">Point camera at QR code or barcode</p>
+                <p className="text-white font-medium">Point camera at stock symbol or QR code</p>
                 <p className="text-gray-400 text-sm">
-                  Position the code within the frame to scan
+                  Scanning for stock symbols, tickers, or financial QR codes
                 </p>
               </div>
 
@@ -183,8 +330,8 @@ export const Scanner: React.FC<ScannerProps> = ({ onScan, onClose }) => {
                 onClick={handleManualInput}
                 className="w-full py-3 bg-[#2a2a2a] text-white rounded-lg hover:bg-[#3a3a3a] transition-colors flex items-center justify-center gap-2"
               >
-                <Camera className="h-4 w-4" />
-                Enter Manually
+                <Search className="h-4 w-4" />
+                Enter Symbol Manually
               </button>
             </div>
           )}

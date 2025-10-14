@@ -9,7 +9,7 @@ import { WatchlistCarousel } from '../components/WatchlistCarousel';
 import { StockSearchResults } from '../components/StockSearchResults';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { OptionsModal } from '../components/OptionsModal';
-import { Scanner } from '../components/Scanner';
+import { StockScanner } from '../components/Scanner';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -151,10 +151,8 @@ export const Dashboard: React.FC = () => {
     }
   ];
 
-  // Handle scanner result
-  const handleScanResult = (result: string) => {
-    console.log('Scanner result:', result);
-    setSearchQuery(result);
+  // Handle scanner close (no result needed since it's a standalone scanner)
+  const handleScannerClose = () => {
     setIsScannerOpen(false);
   };
 
@@ -176,10 +174,10 @@ export const Dashboard: React.FC = () => {
       <div className="h-14 sm:h-16"></div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 pb-8">
-        {/* Search Bar with Scanner */}
+        {/* Search Bar */}
         <div className="py-4 sm:py-6">
-          <div className="flex gap-3 max-w-full sm:max-w-2xl">
-            <div className="relative flex-1">
+          <div className="flex items-center justify-between gap-4">
+            <div className="relative flex-1 max-w-full sm:max-w-2xl">
               <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
                 <Search className="h-4 sm:h-5 w-4 sm:w-5 text-gray-500" />
               </div>
@@ -193,14 +191,14 @@ export const Dashboard: React.FC = () => {
               {searchQuery && <StockSearchResults query={searchQuery} />}
             </div>
             
-            {/* Scanner Button */}
+            {/* Stock Scanner Button - Far Right */}
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 min-w-[44px] sm:min-w-[60px]"
-              title="Scan QR Code or Barcode"
+              className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 min-w-[44px] sm:min-w-[120px] shadow-lg"
+              title="Stock Scanner - Scan QR codes and symbols"
             >
               <Camera className="h-4 sm:h-5 w-4 sm:w-5" />
-              <span className="hidden sm:inline text-sm font-medium">Scan</span>
+              <span className="hidden sm:inline text-sm font-medium">Stock Scanner</span>
             </button>
           </div>
         </div>
@@ -309,11 +307,10 @@ export const Dashboard: React.FC = () => {
         }}
       />
 
-      {/* Scanner Modal */}
+      {/* Stock Scanner Modal */}
       {isScannerOpen && (
-        <Scanner
-          onScan={handleScanResult}
-          onClose={() => setIsScannerOpen(false)}
+        <StockScanner
+          onClose={handleScannerClose}
         />
       )}
     </div>
