@@ -392,9 +392,7 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
   const ScannerHeatMap: React.FC<{
     filters: ScannerFilters;
     onFilterChange: (key: keyof ScannerFilters, value: string) => void;
-    onScan: () => void;
-    onClear: () => void;
-  }> = ({ filters, onFilterChange, onScan, onClear }) => {
+  }> = ({ filters, onFilterChange }) => {
     const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
     
     // Define heat map parameters
@@ -473,33 +471,16 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
 
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Thermometer className="h-5 w-5 text-orange-500" />
-            <h4 className="text-white font-semibold">Parameter Heat Map</h4>
+        {/* Search Bar */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-500" />
           </div>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-gray-800 rounded"></div>
-              <span>None</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-blue-900 rounded"></div>
-              <span>Low</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-yellow-600 rounded"></div>
-              <span>Med</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-orange-500 rounded"></div>
-              <span>High</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 bg-red-500 rounded"></div>
-              <span>Max</span>
-            </div>
-          </div>
+          <input
+            type="text"
+            placeholder="Search parameters..."
+            className="block w-full pl-10 pr-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          />
         </div>
 
         {/* Heat Map Grid */}
@@ -537,26 +518,6 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
           })}
         </div>
 
-        {/* Contract Type Selector */}
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-gray-300">Contract Type</label>
-          <div className="flex gap-2">
-            {contractTypes.map((type) => (
-              <button
-                key={type.key}
-                onClick={() => onFilterChange('contractType', type.key)}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  filters.contractType === type.key
-                    ? `${type.color} text-white`
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Selected Parameter Input */}
         {selectedCell && (
           <div className="p-4 bg-gray-800 rounded-lg">
@@ -583,28 +544,6 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
             />
           </div>
         )}
-
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={onScan}
-            disabled={isLoading}
-            className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
-            {isLoading ? 'Scanning...' : 'Scan Options'}
-          </button>
-          <button
-            onClick={onClear}
-            className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-          >
-            Clear
-          </button>
-        </div>
       </div>
     );
   };
@@ -676,8 +615,6 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
               <ScannerHeatMap
                 filters={filters}
                 onFilterChange={updateFilter}
-                onScan={handleScan}
-                onClear={clearFilters}
               />
             </div>
           </div>
@@ -685,6 +622,28 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
           {/* Results Panel */}
           <div className="flex-1 overflow-y-auto">
             <div className="p-4">
+              {/* Action Buttons */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={handleScan}
+                  disabled={isLoading}
+                  className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  {isLoading ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  ) : (
+                    <Search className="h-4 w-4" />
+                  )}
+                  {isLoading ? 'Scanning...' : 'Scan Options'}
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+
               {isLoading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="text-center">
