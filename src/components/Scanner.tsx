@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Filter, TrendingUp, BarChart3, Eye, DollarSign, Activity, Zap, Info } from 'lucide-react';
+import { X, Search, Filter, TrendingUp, BarChart3, Eye, DollarSign, Activity, Zap, Info, Thermometer } from 'lucide-react';
 
 interface OptionsScannerProps {
   onClose: () => void;
@@ -388,6 +388,227 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
     });
   };
 
+  // Heat Map Component for Scanner Parameters
+  const ScannerHeatMap: React.FC<{
+    filters: ScannerFilters;
+    onFilterChange: (key: keyof ScannerFilters, value: string) => void;
+    onScan: () => void;
+    onClear: () => void;
+  }> = ({ filters, onFilterChange, onScan, onClear }) => {
+    const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
+    
+    // Define heat map parameters
+    const parameters = [
+      { key: 'symbol', label: 'Symbol', type: 'text', placeholder: 'AAPL, TSLA...' },
+      { key: 'minPrice', label: 'Min Price', type: 'number', placeholder: '0.00' },
+      { key: 'maxPrice', label: 'Max Price', type: 'number', placeholder: '100.00' },
+      { key: 'minVolume', label: 'Min Volume', type: 'number', placeholder: '100' },
+      { key: 'minOpenInterest', label: 'Min OI', type: 'number', placeholder: '50' },
+      { key: 'minDelta', label: 'Min Delta', type: 'number', placeholder: '-1.0' },
+      { key: 'maxDelta', label: 'Max Delta', type: 'number', placeholder: '1.0' },
+      { key: 'minGamma', label: 'Min Gamma', type: 'number', placeholder: '0.000' },
+      { key: 'maxGamma', label: 'Max Gamma', type: 'number', placeholder: '0.100' },
+      { key: 'minTheta', label: 'Min Theta', type: 'number', placeholder: '-1.0' },
+      { key: 'maxTheta', label: 'Max Theta', type: 'number', placeholder: '0.0' },
+      { key: 'minVega', label: 'Min Vega', type: 'number', placeholder: '0.00' },
+      { key: 'maxVega', label: 'Max Vega', type: 'number', placeholder: '1.00' },
+      { key: 'minIV', label: 'Min IV', type: 'number', placeholder: '0.10' },
+      { key: 'maxIV', label: 'Max IV', type: 'number', placeholder: '1.00' },
+    ];
+
+    const contractTypes = [
+      { key: 'ALL', label: 'All', color: 'bg-gray-500' },
+      { key: 'CALL', label: 'Calls', color: 'bg-green-500' },
+      { key: 'PUT', label: 'Puts', color: 'bg-red-500' },
+    ];
+
+    // Calculate heat intensity based on filter values
+    const getHeatIntensity = (param: any) => {
+      const value = filters[param.key as keyof ScannerFilters];
+      if (!value) return 0;
+      
+      // Convert value to intensity (0-1)
+      if (param.type === 'number') {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) return 0;
+        
+        // Normalize based on parameter type
+        switch (param.key) {
+          case 'minPrice':
+          case 'maxPrice':
+            return Math.min(numValue / 50, 1);
+          case 'minVolume':
+          case 'minOpenInterest':
+            return Math.min(numValue / 1000, 1);
+          case 'minDelta':
+          case 'maxDelta':
+            return Math.min(Math.abs(numValue), 1);
+          case 'minGamma':
+          case 'maxGamma':
+            return Math.min(numValue * 10, 1);
+          case 'minTheta':
+          case 'maxTheta':
+            return Math.min(Math.abs(numValue), 1);
+          case 'minVega':
+          case 'maxVega':
+            return Math.min(numValue, 1);
+          case 'minIV':
+          case 'maxIV':
+            return Math.min(numValue, 1);
+          default:
+            return 0.5;
+        }
+      }
+      
+      return value.length > 0 ? 0.8 : 0;
+    };
+
+    const getHeatColor = (intensity: number) => {
+      if (intensity === 0) return 'bg-gray-800';
+      if (intensity < 0.3) return 'bg-blue-900';
+      if (intensity < 0.6) return 'bg-yellow-600';
+      if (intensity < 0.8) return 'bg-orange-500';
+      return 'bg-red-500';
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Thermometer className="h-5 w-5 text-orange-500" />
+            <h4 className="text-white font-semibold">Parameter Heat Map</h4>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-gray-800 rounded"></div>
+              <span>None</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-blue-900 rounded"></div>
+              <span>Low</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-yellow-600 rounded"></div>
+              <span>Med</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-orange-500 rounded"></div>
+              <span>High</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-red-500 rounded"></div>
+              <span>Max</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Heat Map Grid */}
+        <div className="grid grid-cols-4 gap-2">
+          {parameters.map((param, index) => {
+            const intensity = getHeatIntensity(param);
+            const heatColor = getHeatColor(intensity);
+            const isSelected = selectedCell?.row === Math.floor(index / 4) && selectedCell?.col === index % 4;
+            
+            return (
+              <div
+                key={param.key}
+                className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                  isSelected ? 'border-blue-500' : 'border-transparent'
+                } ${heatColor} hover:scale-105`}
+                onClick={() => setSelectedCell({ row: Math.floor(index / 4), col: index % 4 })}
+              >
+                <div className="text-center">
+                  <div className="text-xs text-gray-300 font-medium mb-1">{param.label}</div>
+                  <div className="text-xs text-white font-bold">
+                    {filters[param.key as keyof ScannerFilters] || '—'}
+                  </div>
+                </div>
+                
+                {/* Intensity indicator */}
+                <div className="absolute top-1 right-1">
+                  <div className={`w-2 h-2 rounded-full ${
+                    intensity > 0.8 ? 'bg-white' : 
+                    intensity > 0.6 ? 'bg-yellow-200' : 
+                    intensity > 0.3 ? 'bg-blue-200' : 'bg-gray-400'
+                  }`}></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Contract Type Selector */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-300">Contract Type</label>
+          <div className="flex gap-2">
+            {contractTypes.map((type) => (
+              <button
+                key={type.key}
+                onClick={() => onFilterChange('contractType', type.key)}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  filters.contractType === type.key
+                    ? `${type.color} text-white`
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {type.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Selected Parameter Input */}
+        {selectedCell && (
+          <div className="p-4 bg-gray-800 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-white font-medium">
+                {parameters[selectedCell.row * 4 + selectedCell.col]?.label}
+              </span>
+              <button
+                onClick={() => setSelectedCell(null)}
+                className="text-gray-400 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <input
+              type={parameters[selectedCell.row * 4 + selectedCell.col]?.type || 'text'}
+              placeholder={parameters[selectedCell.row * 4 + selectedCell.col]?.placeholder}
+              value={filters[parameters[selectedCell.row * 4 + selectedCell.col]?.key as keyof ScannerFilters] || ''}
+              onChange={(e) => onFilterChange(
+                parameters[selectedCell.row * 4 + selectedCell.col]?.key as keyof ScannerFilters, 
+                e.target.value
+              )}
+              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={onScan}
+            disabled={isLoading}
+            className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+            {isLoading ? 'Scanning...' : 'Scan Options'}
+          </button>
+          <button
+            onClick={onClear}
+            className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // Greek Range Display Component
   const GreekRangeDisplay: React.FC<{ 
     greek: GreekRange; 
@@ -449,236 +670,15 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
         </div>
 
         <div className="flex h-[calc(90vh-80px)]">
-          {/* Filters Sidebar */}
-          <div className="w-80 border-r border-[#2a2a2a] bg-[#0f0f0f] overflow-y-auto">
+          {/* Heat Map Filters Sidebar */}
+          <div className="w-96 border-r border-[#2a2a2a] bg-[#0f0f0f] overflow-y-auto">
             <div className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-white font-semibold">Scan Filters</h4>
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="p-1 hover:bg-[#2a2a2a] rounded transition-colors"
-                >
-                  <Filter className="h-4 w-4 text-gray-400" />
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                {/* Symbol Filter */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Symbol</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., AAPL, TSLA"
-                    value={filters.symbol}
-                    onChange={(e) => updateFilter('symbol', e.target.value)}
-                    className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-
-                {/* Price Range */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Min Price</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={filters.minPrice}
-                      onChange={(e) => updateFilter('minPrice', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Max Price</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="100.00"
-                      value={filters.maxPrice}
-                      onChange={(e) => updateFilter('maxPrice', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Volume & Open Interest */}
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Min Volume</label>
-                    <input
-                      type="number"
-                      placeholder="100"
-                      value={filters.minVolume}
-                      onChange={(e) => updateFilter('minVolume', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Min OI</label>
-                    <input
-                      type="number"
-                      placeholder="50"
-                      value={filters.minOpenInterest}
-                      onChange={(e) => updateFilter('minOpenInterest', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Greeks - Delta */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center gap-1">
-                    <Zap className="h-3 w-3" />
-                    Delta Range
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="-1.0"
-                      value={filters.minDelta}
-                      onChange={(e) => updateFilter('minDelta', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="1.0"
-                      value={filters.maxDelta}
-                      onChange={(e) => updateFilter('maxDelta', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Greeks - Gamma */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Gamma Range</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      step="0.001"
-                      placeholder="0.000"
-                      value={filters.minGamma}
-                      onChange={(e) => updateFilter('minGamma', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                    <input
-                      type="number"
-                      step="0.001"
-                      placeholder="0.100"
-                      value={filters.maxGamma}
-                      onChange={(e) => updateFilter('maxGamma', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Greeks - Theta */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Theta Range</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="-1.0"
-                      value={filters.minTheta}
-                      onChange={(e) => updateFilter('minTheta', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.0"
-                      value={filters.maxTheta}
-                      onChange={(e) => updateFilter('maxTheta', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Greeks - Vega */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Vega Range</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.00"
-                      value={filters.minVega}
-                      onChange={(e) => updateFilter('minVega', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="1.00"
-                      value={filters.maxVega}
-                      onChange={(e) => updateFilter('maxVega', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* IV Range */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">IV Range</label>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="0.10"
-                      value={filters.minIV}
-                      onChange={(e) => updateFilter('minIV', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                    <input
-                      type="number"
-                      step="0.01"
-                      placeholder="1.00"
-                      value={filters.maxIV}
-                      onChange={(e) => updateFilter('maxIV', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                {/* Contract Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Contract Type</label>
-                  <select
-                    value={filters.contractType}
-                    onChange={(e) => updateFilter('contractType', e.target.value)}
-                    className="w-full px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option value="ALL">All Contracts</option>
-                    <option value="CALL">Calls Only</option>
-                    <option value="PUT">Puts Only</option>
-                  </select>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-4">
-                  <button
-                    onClick={handleScan}
-                    disabled={isLoading}
-                    className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-                  >
-                    {isLoading ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    ) : (
-                      <Search className="h-4 w-4" />
-                    )}
-                    {isLoading ? 'Scanning...' : 'Scan Options'}
-                  </button>
-                  <button
-                    onClick={clearFilters}
-                    className="px-3 py-2 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded-lg transition-colors"
-                  >
-                    Clear
-                  </button>
-                </div>
-              </div>
+              <ScannerHeatMap
+                filters={filters}
+                onFilterChange={updateFilter}
+                onScan={handleScan}
+                onClear={clearFilters}
+              />
             </div>
           </div>
 
