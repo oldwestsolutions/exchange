@@ -227,7 +227,7 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
     timeValue: number,
     intrinsicValue: number,
     totalValue: number,
-    return: string,
+    returnValue: string,
     underlyingPrice: number,
     timeToExpiration: number
   ): OptionsContract => ({
@@ -250,7 +250,7 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
     timeValue,
     intrinsicValue,
     totalValue,
-    return,
+    return: returnValue,
     underlyingPrice,
     timeToExpiration,
     greeks: calculateGreekRanges(delta, gamma, theta, vega, rho, underlyingPrice, strike, timeToExpiration, impliedVolatility, type)
