@@ -3,12 +3,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp } from 'lucide-react';
+import { Search, TrendingUp, Camera } from 'lucide-react';
 import { NewsTicker } from '../components/NewsTicker';
 import { WatchlistCarousel } from '../components/WatchlistCarousel';
 import { StockSearchResults } from '../components/StockSearchResults';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { OptionsModal } from '../components/OptionsModal';
+import { Scanner } from '../components/Scanner';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,6 +17,7 @@ export const Dashboard: React.FC = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [selectedContract, setSelectedContract] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   // Handle scroll to show/hide header
   useEffect(() => {
@@ -149,6 +151,13 @@ export const Dashboard: React.FC = () => {
     }
   ];
 
+  // Handle scanner result
+  const handleScanResult = (result: string) => {
+    console.log('Scanner result:', result);
+    setSearchQuery(result);
+    setIsScannerOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* Minimal Header with Auto-Hide */}
@@ -167,20 +176,32 @@ export const Dashboard: React.FC = () => {
       <div className="h-14 sm:h-16"></div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 pb-8">
-        {/* Search Bar */}
+        {/* Search Bar with Scanner */}
         <div className="py-4 sm:py-6">
-          <div className="relative max-w-full sm:max-w-2xl">
-            <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-              <Search className="h-4 sm:h-5 w-4 sm:w-5 text-gray-500" />
+          <div className="flex gap-3 max-w-full sm:max-w-2xl">
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                <Search className="h-4 sm:h-5 w-4 sm:w-5 text-gray-500" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search stocks (e.g., IBM, AAPL, TSLA)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 border border-[#2a2a2a] rounded-lg bg-[#0f0f0f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-sm sm:text-base"
+              />
+              {searchQuery && <StockSearchResults query={searchQuery} />}
             </div>
-            <input
-              type="text"
-              placeholder="Search stocks (e.g., IBM, AAPL, TSLA)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 border border-[#2a2a2a] rounded-lg bg-[#0f0f0f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-sm sm:text-base"
-            />
-            {searchQuery && <StockSearchResults query={searchQuery} />}
+            
+            {/* Scanner Button */}
+            <button
+              onClick={() => setIsScannerOpen(true)}
+              className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center justify-center gap-2 min-w-[44px] sm:min-w-[60px]"
+              title="Scan QR Code or Barcode"
+            >
+              <Camera className="h-4 sm:h-5 w-4 sm:w-5" />
+              <span className="hidden sm:inline text-sm font-medium">Scan</span>
+            </button>
           </div>
         </div>
 
@@ -287,6 +308,14 @@ export const Dashboard: React.FC = () => {
           setSelectedContract(null);
         }}
       />
+
+      {/* Scanner Modal */}
+      {isScannerOpen && (
+        <Scanner
+          onScan={handleScanResult}
+          onClose={() => setIsScannerOpen(false)}
+        />
+      )}
     </div>
   );
 };
