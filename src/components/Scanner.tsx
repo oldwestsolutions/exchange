@@ -66,10 +66,7 @@ interface ScannerFilters {
 }
 
 export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
-  const [isScanning, setIsScanning] = useState(false);
   const [results, setResults] = useState<OptionsContract[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<ScannerFilters>({
     symbol: '',
     minPrice: '',
@@ -343,19 +340,11 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
     });
   };
 
-  // Scan for options contracts
-  const handleScan = () => {
-    setIsLoading(true);
-    setIsScanning(true);
-
-    // Simulate API call delay
-    setTimeout(() => {
-      const filteredResults = filterContracts(mockOptionsContracts, filters);
-      setResults(filteredResults);
-      setIsLoading(false);
-      setIsScanning(false);
-    }, 1500);
-  };
+  // Real-time filtering - no manual scan needed
+  useEffect(() => {
+    const filteredResults = filterContracts(mockOptionsContracts, filters);
+    setResults(filteredResults);
+  }, [filters]);
 
   // Update filter
   const updateFilter = (key: keyof ScannerFilters, value: string) => {
@@ -365,37 +354,13 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
     }));
   };
 
-  // Clear all filters
-  const clearFilters = () => {
-    setFilters({
-      symbol: '',
-      minPrice: '',
-      maxPrice: '',
-      minVolume: '100',
-      minOpenInterest: '50',
-      minDelta: '',
-      maxDelta: '',
-      minGamma: '',
-      maxGamma: '',
-      minTheta: '',
-      maxTheta: '',
-      minVega: '',
-      maxVega: '',
-      minIV: '',
-      maxIV: '',
-      contractType: 'ALL',
-      expirationRange: 'ALL'
-    });
-  };
 
   // Heat Map Component for Scanner Parameters
   const ScannerHeatMap: React.FC<{
     filters: ScannerFilters;
     onFilterChange: (key: keyof ScannerFilters, value: string) => void;
-    onScan: () => void;
-    onClear: () => void;
-    isLoading: boolean;
-  }> = ({ filters, onFilterChange, onScan, onClear, isLoading }) => {
+    results: OptionsContract[];
+  }> = ({ filters, onFilterChange, results }) => {
     const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
     
     // Define heat map parameters
@@ -545,30 +510,27 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
               )}
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            
+            {/* Live Results Preview */}
+            {results.length > 0 && (
+              <div className="mt-3 p-3 bg-gray-800 rounded-lg">
+                <div className="text-xs text-gray-400 mb-2">Live Results ({results.length} contracts)</div>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {results.slice(0, 5).map((contract) => (
+                    <div key={contract.id} className="flex items-center justify-between text-xs">
+                      <span className="text-white font-medium">{contract.symbol} ${contract.strike} {contract.type}</span>
+                      <span className="text-green-400">${contract.last.toFixed(2)}</span>
+                    </div>
+                  ))}
+                  {results.length > 5 && (
+                    <div className="text-xs text-gray-500 text-center">+{results.length - 5} more...</div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={onScan}
-            disabled={isLoading}
-            className="flex-1 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white rounded-lg transition-colors flex items-center justify-center gap-2"
-          >
-            {isLoading ? (
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-            ) : (
-              <Search className="h-4 w-4" />
-            )}
-            {isLoading ? 'Scanning...' : 'Scan Options'}
-          </button>
-          <button
-            onClick={onClear}
-            className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
-          >
-            Clear
-          </button>
-        </div>
       </div>
     );
   };
@@ -618,7 +580,7 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1a1a] rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-[#1a1a1a] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a]">
           <div className="flex items-center gap-2">
@@ -633,148 +595,14 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
           </button>
         </div>
 
-        <div className="flex h-[calc(90vh-80px)]">
-          {/* Heat Map Filters Sidebar */}
-          <div className="w-96 border-r border-[#2a2a2a] bg-[#0f0f0f] overflow-y-auto">
-            <div className="p-4">
-              <ScannerHeatMap
-                filters={filters}
-                onFilterChange={updateFilter}
-                onScan={handleScan}
-                onClear={clearFilters}
-                isLoading={isLoading}
-              />
-            </div>
-          </div>
-
-          {/* Results Panel */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="p-4">
-              {isLoading ? (
-                <div className="flex items-center justify-center h-64">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-                    <p className="text-white text-lg font-semibold">Scanning Options...</p>
-                    <p className="text-gray-400 text-sm">Filtering contracts based on your criteria</p>
-                  </div>
-                </div>
-              ) : results.length > 0 ? (
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-white font-semibold">Found {results.length} Contracts</h4>
-                    <div className="text-sm text-gray-400">
-                      Last updated: {new Date().toLocaleTimeString()}
-                    </div>
-                  </div>
-                  
-                  <div className="grid gap-3">
-                    {results.map((contract) => (
-                      <div
-                        key={contract.id}
-                        className="bg-[#0f0f0f] border border-[#2a2a2a] rounded-lg p-4 hover:border-green-500/50 transition-colors"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg font-bold text-white">{contract.symbol}</span>
-                              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                                contract.type === 'CALL' 
-                                  ? 'bg-green-500/20 text-green-400' 
-                                  : 'bg-red-500/20 text-red-400'
-                              }`}>
-                                {contract.type}
-                              </span>
-                            </div>
-                            <div className="text-sm text-gray-400">
-                              ${contract.strike} • {new Date(contract.expiration).toLocaleDateString()}
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-lg font-bold text-white">${contract.last.toFixed(2)}</div>
-                            <div className="text-sm text-gray-400">
-                              {contract.bid.toFixed(2)} / {contract.ask.toFixed(2)}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="grid grid-cols-4 gap-4 text-sm">
-                          <div>
-                            <div className="text-gray-400">Volume</div>
-                            <div className="text-white font-medium">{contract.volume.toLocaleString()}</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-400">OI</div>
-                            <div className="text-white font-medium">{contract.openInterest.toLocaleString()}</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-400">IV</div>
-                            <div className="text-white font-medium">{(contract.impliedVolatility * 100).toFixed(1)}%</div>
-                          </div>
-                          <div>
-                            <div className="text-gray-400">Return</div>
-                            <div className={`font-medium ${
-                              contract.return.startsWith('+') ? 'text-green-500' : 'text-red-500'
-                            }`}>
-                              {contract.return}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* Greek Analytics Section */}
-                        <div className="mt-4 pt-4 border-t border-[#2a2a2a]">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Zap className="h-4 w-4 text-blue-500" />
-                            <h5 className="text-white font-medium text-sm">Greek Analytics</h5>
-                            <div className="group relative">
-                              <Info className="h-3 w-3 text-gray-500 cursor-help" />
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                Mode: Current value<br/>
-                                Range: Min-Max over ±5% price, ±20% vol variations
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-2 gap-4">
-                            <GreekRangeDisplay
-                              greek={contract.greeks.delta}
-                              label="Delta"
-                              formatValue={(value) => value.toFixed(3)}
-                              color="bg-blue-500"
-                            />
-                            <GreekRangeDisplay
-                              greek={contract.greeks.gamma}
-                              label="Gamma"
-                              formatValue={(value) => value.toFixed(4)}
-                              color="bg-purple-500"
-                            />
-                            <GreekRangeDisplay
-                              greek={contract.greeks.theta}
-                              label="Theta"
-                              formatValue={(value) => value.toFixed(3)}
-                              color="bg-red-500"
-                            />
-                            <GreekRangeDisplay
-                              greek={contract.greeks.vega}
-                              label="Vega"
-                              formatValue={(value) => value.toFixed(3)}
-                              color="bg-green-500"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center justify-center h-64">
-                  <div className="text-center">
-                    <Eye className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-                    <p className="text-white text-lg font-semibold mb-2">Ready to Scan</p>
-                    <p className="text-gray-400 text-sm">Configure your parameters and scan for options</p>
-                  </div>
-                </div>
-              )}
-            </div>
+        {/* Single Column Heat Map */}
+        <div className="h-[calc(90vh-80px)] overflow-y-auto">
+          <div className="p-4">
+            <ScannerHeatMap
+              filters={filters}
+              onFilterChange={updateFilter}
+              results={results}
+            />
           </div>
         </div>
       </div>
