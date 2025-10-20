@@ -1,15 +1,16 @@
 /**
- * Modern minimal dashboard with wallet and strategies
+ * Modern minimal dashboard with wallet and investing balance
  */
 
 import React, { useState, useEffect } from 'react';
-import { Search, TrendingUp, Eye } from 'lucide-react';
+import { Search, TrendingUp, Eye, DollarSign } from 'lucide-react';
 import { NewsTicker } from '../components/NewsTicker';
 import { WatchlistCarousel } from '../components/WatchlistCarousel';
 import { StockSearchResults } from '../components/StockSearchResults';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { OptionsModal } from '../components/OptionsModal';
 import { OptionsScanner } from '../components/Scanner';
+import { CompanySearch } from '../components/CompanySearch';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -165,7 +166,14 @@ export const Dashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <span className="text-lg sm:text-2xl font-serif font-bold text-white">General Exchange</span>
-            <ProfileMenu />
+            <div className="flex items-center gap-4">
+              {/* Investing Balance */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-[#0f0f0f] rounded-lg border border-[#2a2a2a]">
+                <DollarSign className="h-4 w-4 text-green-500" />
+                <div className="text-lg font-bold text-white">$127,583</div>
+              </div>
+              <ProfileMenu />
+            </div>
           </div>
         </div>
       </nav>
@@ -174,21 +182,18 @@ export const Dashboard: React.FC = () => {
       <div className="h-14 sm:h-16"></div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 pb-8">
-        {/* Search Bar */}
+        {/* Company Search */}
         <div className="py-4 sm:py-6">
           <div className="flex items-center justify-between gap-4">
-            <div className="relative flex-1 max-w-full sm:max-w-2xl">
-              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
-                <Search className="h-4 sm:h-5 w-4 sm:w-5 text-gray-500" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search stocks (e.g., IBM, AAPL, TSLA)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 border border-[#2a2a2a] rounded-lg bg-[#0f0f0f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-sm sm:text-base"
+            <div className="flex-1 max-w-full sm:max-w-2xl">
+              <CompanySearch
+                placeholder="Search companies (e.g., AAPL, Microsoft, Technology)..."
+                onCompanySelect={(company) => {
+                  console.log('Selected company:', company);
+                  // Handle company selection
+                }}
+                className="w-full"
               />
-              {searchQuery && <StockSearchResults query={searchQuery} />}
             </div>
             
             {/* Options Scanner Button - Far Right */}
@@ -231,66 +236,10 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Sticky Section - Watchlist and Strategies move together */}
+        {/* Sticky Section - Watchlist only */}
         <div className="sticky top-0 z-40 bg-[#0a0a0a]">
           {/* Watchlist Carousel */}
           <WatchlistCarousel options={watchlistOptions} />
-          
-          {/* Options Contracts Section */}
-          <div className="bg-[#0a0a0a] px-3 sm:px-6 lg:px-12 py-4 sm:py-6">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex items-center justify-between mb-4 sm:mb-6">
-                <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white">Strategies</h2>
-                <button className="text-blue-500 hover:text-blue-400 font-semibold transition-colors text-sm sm:text-base">
-                  View All
-                </button>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-                {optionsContracts.map((option) => {
-                  const isProfit = option.return.startsWith('+');
-                  return (
-                    <div
-                      key={option.id}
-                      onClick={() => {
-                        console.log('Option clicked:', option);
-                        setSelectedContract(option);
-                        setIsModalOpen(true);
-                        console.log('Modal should be open:', true);
-                      }}
-                      className={`rounded-lg p-3 sm:p-4 hover:border-blue-600 transition-all cursor-pointer group border-2 ${
-                        isProfit 
-                          ? 'bg-green-500/5 border-green-500/30' 
-                          : 'bg-red-500/5 border-red-500/30'
-                      }`}
-                    >
-                      <div className="text-center">
-                        <div className="flex items-center justify-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                          <span className="text-base sm:text-xl font-bold text-white">{option.symbol}</span>
-                          <span className={`text-xs px-1.5 sm:px-2 py-0.5 rounded ${
-                            option.type === 'CALL' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                          }`}>
-                            {option.type}
-                          </span>
-                        </div>
-                        <div className="text-lg sm:text-2xl font-bold text-white mb-0.5 sm:mb-1">
-                          ${option.strike}
-                        </div>
-                        <div className="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2">
-                          ${option.totalValue.toLocaleString()}
-                        </div>
-                        <div className={`text-sm sm:text-lg font-bold ${
-                          isProfit ? 'text-green-500' : 'text-red-500'
-                        }`}>
-                          {option.return}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Spacer to prevent content from being hidden behind sticky section */}
