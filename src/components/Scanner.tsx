@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Filter, TrendingUp, BarChart3, Eye, DollarSign, Activity, Zap, Info, Thermometer } from 'lucide-react';
+import { X, Search, Eye, Info } from 'lucide-react';
 
 interface OptionsScannerProps {
   onClose: () => void;
@@ -382,11 +382,12 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
       { key: 'maxIV', label: 'Max IV', type: 'number', placeholder: '1.00' },
     ];
 
-    const contractTypes = [
-      { key: 'ALL', label: 'All', color: 'bg-gray-500' },
-      { key: 'CALL', label: 'Calls', color: 'bg-green-500' },
-      { key: 'PUT', label: 'Puts', color: 'bg-red-500' },
-    ];
+    // Contract types for future use
+    // const contractTypes = [
+    //   { key: 'ALL', label: 'All', color: 'bg-gray-500' },
+    //   { key: 'CALL', label: 'Calls', color: 'bg-green-500' },
+    //   { key: 'PUT', label: 'Puts', color: 'bg-red-500' },
+    // ];
 
     // Calculate heat intensity based on filter values
     const getHeatIntensity = (param: any) => {
@@ -535,48 +536,48 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
     );
   };
 
-  // Greek Range Display Component
-  const GreekRangeDisplay: React.FC<{ 
-    greek: GreekRange; 
-    label: string; 
-    formatValue: (value: number) => string;
-    color: string;
-  }> = ({ greek, label, formatValue, color }) => {
-    const range = greek.max - greek.min;
-    const modePosition = range > 0 ? ((greek.mode - greek.min) / range) * 100 : 50;
-    
-    return (
-      <div className="space-y-1">
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-400">{label}</span>
-          <div className="flex items-center gap-1">
-            <span className="text-white font-medium">{formatValue(greek.mode)}</span>
-            <div className="group relative">
-              <Info className="h-3 w-3 text-gray-500 cursor-help" />
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                Mode: {formatValue(greek.mode)}<br/>
-                Range: {formatValue(greek.min)} - {formatValue(greek.max)}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-          <div 
-            className={`h-full ${color} opacity-30`}
-            style={{ width: '100%' }}
-          />
-          <div 
-            className={`absolute top-0 h-full w-1 ${color} opacity-80`}
-            style={{ left: `${Math.max(0, Math.min(100, modePosition))}%` }}
-          />
-        </div>
-        <div className="flex justify-between text-xs text-gray-500">
-          <span>{formatValue(greek.min)}</span>
-          <span>{formatValue(greek.max)}</span>
-        </div>
-      </div>
-    );
-  };
+  // Greek Range Display Component (for future use)
+  // const GreekRangeDisplay: React.FC<{ 
+  //   greek: GreekRange; 
+  //   label: string; 
+  //   formatValue: (value: number) => string;
+  //   color: string;
+  // }> = ({ greek, label, formatValue, color }) => {
+  //   const range = greek.max - greek.min;
+  //   const modePosition = range > 0 ? ((greek.mode - greek.min) / range) * 100 : 50;
+  //   
+  //   return (
+  //     <div className="space-y-1">
+  //       <div className="flex items-center justify-between text-xs">
+  //         <span className="text-gray-400">{label}</span>
+  //         <div className="flex items-center gap-1">
+  //           <span className="text-white font-medium">{formatValue(greek.mode)}</span>
+  //           <div className="group relative">
+  //             <Info className="h-3 w-3 text-gray-500 cursor-help" />
+  //             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+  //               Mode: {formatValue(greek.mode)}<br/>
+  //               Range: {formatValue(greek.min)} - {formatValue(greek.max)}
+  //             </div>
+  //           </div>
+  //         </div>
+  //       </div>
+  //       <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
+  //         <div 
+  //           className={`h-full ${color} opacity-30`}
+  //           style={{ width: '100%' }}
+  //         />
+  //         <div 
+  //           className={`absolute top-0 h-full w-1 ${color} opacity-80`}
+  //           style={{ left: `${Math.max(0, Math.min(100, modePosition))}%` }}
+  //         />
+  //       </div>
+  //       <div className="flex justify-between text-xs text-gray-500">
+  //         <span>{formatValue(greek.min)}</span>
+  //         <span>{formatValue(greek.max)}</span>
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
