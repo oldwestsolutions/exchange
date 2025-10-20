@@ -10,7 +10,6 @@ import { StockSearchResults } from '../components/StockSearchResults';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { OptionsModal } from '../components/OptionsModal';
 import { OptionsScanner } from '../components/Scanner';
-import { CompanySearch } from '../components/CompanySearch';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -182,18 +181,21 @@ export const Dashboard: React.FC = () => {
       <div className="h-14 sm:h-16"></div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12 pb-8">
-        {/* Company Search */}
+        {/* Search Bar */}
         <div className="py-4 sm:py-6">
           <div className="flex items-center justify-between gap-4">
-            <div className="flex-1 max-w-full sm:max-w-2xl">
-              <CompanySearch
-                placeholder="Search companies (e.g., AAPL, Microsoft, Technology)..."
-                onCompanySelect={(company) => {
-                  console.log('Selected company:', company);
-                  // Handle company selection
-                }}
-                className="w-full"
+            <div className="relative flex-1 max-w-full sm:max-w-2xl">
+              <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                <Search className="h-4 sm:h-5 w-4 sm:w-5 text-gray-500" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search stocks (e.g., IBM, AAPL, TSLA)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 border border-[#2a2a2a] rounded-lg bg-[#0f0f0f] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all text-sm sm:text-base"
               />
+              {searchQuery && <StockSearchResults query={searchQuery} />}
             </div>
             
             {/* Options Scanner Button - Far Right */}

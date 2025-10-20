@@ -1,611 +1,385 @@
-import React, { useState, useEffect } from 'react';
-import { X, Search, Eye } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Send, TrendingUp, AlertTriangle, Zap, Brain, MessageSquare, Eye, DollarSign, Activity } from 'lucide-react';
+import { GreeksHeatmapModal } from './GreeksHeatmapModal';
 
 interface OptionsScannerProps {
   onClose: () => void;
 }
 
-interface GreekRange {
-  min: number;
-  max: number;
-  mode: number;
-}
-
-interface GreekAnalytics {
-  delta: GreekRange;
-  gamma: GreekRange;
-  theta: GreekRange;
-  vega: GreekRange;
-  rho: GreekRange;
-}
-
-interface OptionsContract {
+interface ChatMessage {
   id: string;
-  symbol: string;
-  type: 'CALL' | 'PUT';
-  strike: number;
-  expiration: string;
-  bid: number;
-  ask: number;
-  last: number;
-  volume: number;
-  openInterest: number;
-  impliedVolatility: number;
-  delta: number;
-  gamma: number;
-  theta: number;
-  vega: number;
-  rho: number;
-  timeValue: number;
-  intrinsicValue: number;
-  totalValue: number;
-  return: string;
-  greeks: GreekAnalytics;
-  underlyingPrice: number;
-  timeToExpiration: number;
+  type: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  data?: any;
+  isTyping?: boolean;
 }
 
-interface ScannerFilters {
+interface VolatileStock {
   symbol: string;
-  minPrice: string;
-  maxPrice: string;
-  minVolume: string;
-  minOpenInterest: string;
-  minDelta: string;
-  maxDelta: string;
-  minGamma: string;
-  maxGamma: string;
-  minTheta: string;
-  maxTheta: string;
-  minVega: string;
-  maxVega: string;
-  minIV: string;
-  maxIV: string;
-  contractType: 'ALL' | 'CALL' | 'PUT';
-  expirationRange: 'ALL' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY';
+  name: string;
+  price: number;
+  change: number;
+  changePercent: number;
+  volume: string;
+  volatility: number;
+  options: {
+    calls: number;
+    puts: number;
+    totalVolume: string;
+    avgIV: number;
+  };
 }
 
 export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
-  const [results, setResults] = useState<OptionsContract[]>([]);
-  const [filters, setFilters] = useState<ScannerFilters>({
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      type: 'assistant',
+      content: 'Here are the stocks with the highest absolute Delta values - these are the most sensitive to underlying price movements:',
+      timestamp: new Date(),
+      data: { type: 'high_delta_options', stocks: volatileStocks.sort((a, b) => b.options.avgIV - a.options.avgIV) }
+    }
+  ]);
+
+  const [currentInput, setCurrentInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [heatmapModal, setHeatmapModal] = useState<{isOpen: boolean, symbol: string, companyName: string}>({
+    isOpen: false,
     symbol: '',
-    minPrice: '',
-    maxPrice: '',
-    minVolume: '100',
-    minOpenInterest: '50',
-    minDelta: '',
-    maxDelta: '',
-    minGamma: '',
-    maxGamma: '',
-    minTheta: '',
-    maxTheta: '',
-    minVega: '',
-    maxVega: '',
-    minIV: '',
-    maxIV: '',
-    contractType: 'ALL',
-    expirationRange: 'ALL'
+    companyName: ''
   });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Risk Engine: Calculate Greek ranges based on market variations
-  const calculateGreekRanges = (
-    modeDelta: number,
-    modeGamma: number,
-    modeTheta: number,
-    modeVega: number,
-    modeRho: number,
-    underlyingPrice: number,
-    strike: number,
-    timeToExpiration: number,
-    impliedVolatility: number,
-    type: 'CALL' | 'PUT'
-  ): GreekAnalytics => {
-    // Simulate price variations (±5%)
-    const priceVariations = [-0.05, -0.025, 0, 0.025, 0.05];
-    // Simulate volatility variations (±20%)
-    const volVariations = [-0.20, -0.10, 0, 0.10, 0.20];
-    // Simulate time decay (1 day, 1 week, current, 1 week forward)
-    const timeVariations = [-7, -1, 0, 1, 7];
+  // Mock volatile stocks data
+  const volatileStocks: VolatileStock[] = [
+    {
+      symbol: 'TSLA',
+      name: 'Tesla, Inc.',
+      price: 258.67,
+      change: 8.92,
+      changePercent: 3.57,
+      volume: '102.5M',
+      volatility: 0.68,
+      options: { calls: 1250, puts: 890, totalVolume: '2.1M', avgIV: 0.45 }
+    },
+    {
+      symbol: 'NVDA',
+      name: 'NVIDIA Corporation',
+      price: 456.23,
+      change: 12.45,
+      changePercent: 2.81,
+      volume: '45.2M',
+      volatility: 0.52,
+      options: { calls: 2100, puts: 1200, totalVolume: '3.3M', avgIV: 0.38 }
+    },
+    {
+      symbol: 'AMZN',
+      name: 'Amazon.com Inc.',
+      price: 142.38,
+      change: -1.24,
+      changePercent: -0.86,
+      volume: '28.7M',
+      volatility: 0.41,
+      options: { calls: 1800, puts: 1500, totalVolume: '3.3M', avgIV: 0.32 }
+    },
+    {
+      symbol: 'AAPL',
+      name: 'Apple Inc.',
+      price: 178.45,
+      change: -1.23,
+      changePercent: -0.68,
+      volume: '58.3M',
+      volatility: 0.35,
+      options: { calls: 3200, puts: 2100, totalVolume: '5.3M', avgIV: 0.28 }
+    },
+    {
+      symbol: 'META',
+      name: 'Meta Platforms Inc.',
+      price: 312.45,
+      change: 8.92,
+      changePercent: 2.94,
+      volume: '18.3M',
+      volatility: 0.48,
+      options: { calls: 950, puts: 750, totalVolume: '1.7M', avgIV: 0.42 }
+    }
+  ];
 
-    const deltaValues: number[] = [];
-    const gammaValues: number[] = [];
-    const thetaValues: number[] = [];
-    const vegaValues: number[] = [];
-    const rhoValues: number[] = [];
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-    // Calculate Greeks for all combinations
-    priceVariations.forEach(priceChange => {
-      volVariations.forEach(volChange => {
-        timeVariations.forEach(timeChange => {
-          const newPrice = underlyingPrice * (1 + priceChange);
-          const newVol = impliedVolatility * (1 + volChange);
-          const newTime = Math.max(0.01, timeToExpiration + timeChange / 365);
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
-          // Simplified Black-Scholes Greek calculations
-          const d1 = (Math.log(newPrice / strike) + (0.05 + 0.5 * newVol * newVol) * newTime) / (newVol * Math.sqrt(newTime));
-          const d2 = d1 - newVol * Math.sqrt(newTime);
+  const handleSendMessage = async () => {
+    if (!currentInput.trim() || isLoading) return;
 
-          // Delta calculation
-          const delta = type === 'CALL' ? 
-            (0.5 * (1 + erf(d1 / Math.sqrt(2)))) : 
-            (0.5 * (1 + erf(d1 / Math.sqrt(2))) - 1);
-          
-          // Gamma calculation
-          const gamma = Math.exp(-d1 * d1 / 2) / (newPrice * newVol * Math.sqrt(2 * Math.PI * newTime));
-          
-          // Theta calculation
-          const theta = -(newPrice * Math.exp(-d1 * d1 / 2) * newVol) / (2 * Math.sqrt(2 * Math.PI * newTime)) - 
-                       0.05 * strike * Math.exp(-0.05 * newTime) * (type === 'CALL' ? 
-                       (0.5 * (1 + erf(d2 / Math.sqrt(2)))) : 
-                       (0.5 * (1 + erf(d2 / Math.sqrt(2))) - 1));
-          
-          // Vega calculation
-          const vega = newPrice * Math.sqrt(newTime) * Math.exp(-d1 * d1 / 2) / Math.sqrt(2 * Math.PI) / 100;
-          
-          // Rho calculation
-          const rho = strike * newTime * Math.exp(-0.05 * newTime) * (type === 'CALL' ? 
-                     (0.5 * (1 + erf(d2 / Math.sqrt(2)))) : 
-                     (0.5 * (1 + erf(d2 / Math.sqrt(2))) - 1)) / 100;
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: currentInput,
+      timestamp: new Date()
+    };
 
-          deltaValues.push(delta);
-          gammaValues.push(gamma);
-          thetaValues.push(theta);
-          vegaValues.push(vega);
-          rhoValues.push(rho);
-        });
-      });
-    });
+    setMessages(prev => [...prev, userMessage]);
+    setCurrentInput('');
+    setIsLoading(true);
 
-    // Helper function for error function approximation
-    function erf(x: number): number {
-      const a1 =  0.254829592;
-      const a2 = -0.284496736;
-      const a3 =  1.421413741;
-      const a4 = -1.453152027;
-      const a5 =  1.061405429;
-      const p  =  0.3275911;
+    // Simulate AI processing
+    setTimeout(() => {
+      const response = generateAIResponse(currentInput);
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'assistant',
+        content: response.content,
+        data: response.data,
+        timestamp: new Date()
+      };
 
-      const sign = x < 0 ? -1 : 1;
-      x = Math.abs(x);
+      setMessages(prev => [...prev, assistantMessage]);
+      setIsLoading(false);
+    }, 1500);
+  };
 
-      const t = 1.0 / (1.0 + p * x);
-      const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+  const generateAIResponse = (input: string) => {
+    const lowerInput = input.toLowerCase();
 
-      return sign * y;
+    if (lowerInput.includes('volatile') || lowerInput.includes('volatility')) {
+      return {
+        content: `Here are the most volatile stocks today with high options activity:`,
+        data: { type: 'volatile_stocks', stocks: volatileStocks }
+      };
+    }
+
+    if (lowerInput.includes('high volume') || lowerInput.includes('volume')) {
+      return {
+        content: `These stocks have the highest options volume today:`,
+        data: { type: 'high_volume', stocks: volatileStocks.sort((a, b) => parseInt(b.options.totalVolume) - parseInt(a.options.totalVolume)) }
+      };
+    }
+
+    if (lowerInput.includes('calls') || lowerInput.includes('call')) {
+      return {
+        content: `Here are the best call options opportunities based on volume and IV:`,
+        data: { type: 'call_options', stocks: volatileStocks.filter(s => s.options.calls > s.options.puts) }
+      };
+    }
+
+    if (lowerInput.includes('puts') || lowerInput.includes('put')) {
+      return {
+        content: `Here are the best put options for hedging and bearish plays:`,
+        data: { type: 'put_options', stocks: volatileStocks.filter(s => s.options.puts > s.options.calls) }
+      };
+    }
+
+    if (lowerInput.includes('tesla') || lowerInput.includes('tsla')) {
+      const tesla = volatileStocks.find(s => s.symbol === 'TSLA');
+      return {
+        content: `Tesla (TSLA) Analysis:\n\n• Current Price: $${tesla?.price}\n• Change: ${tesla?.changePercent > 0 ? '+' : ''}${tesla?.changePercent}%\n• Volatility: ${tesla?.volatility * 100}%\n• Options Volume: ${tesla?.options.totalVolume}\n• Average IV: ${tesla?.options.avgIV * 100}%\n\nHigh volatility makes TSLA great for options trading!`,
+        data: { type: 'stock_analysis', stock: tesla }
+      };
     }
 
     return {
-      delta: {
-        mode: modeDelta,
-        min: Math.min(...deltaValues),
-        max: Math.max(...deltaValues)
-      },
-      gamma: {
-        mode: modeGamma,
-        min: Math.min(...gammaValues),
-        max: Math.max(...gammaValues)
-      },
-      theta: {
-        mode: modeTheta,
-        min: Math.min(...thetaValues),
-        max: Math.max(...thetaValues)
-      },
-      vega: {
-        mode: modeVega,
-        min: Math.min(...vegaValues),
-        max: Math.max(...vegaValues)
-      },
-      rho: {
-        mode: modeRho,
-        min: Math.min(...rhoValues),
-        max: Math.max(...rhoValues)
-      }
+      content: `I understand you're looking for "${input}". Let me help you find the best options opportunities. Try asking me about:\n\n• Most volatile stocks\n• High-volume options\n• Call or put opportunities\n• Specific stocks like Tesla, Apple, or NVIDIA`
     };
   };
 
-  // Helper function to create contract with Greek analytics
-  const createContract = (
-    id: string,
-    symbol: string,
-    type: 'CALL' | 'PUT',
-    strike: number,
-    expiration: string,
-    bid: number,
-    ask: number,
-    last: number,
-    volume: number,
-    openInterest: number,
-    impliedVolatility: number,
-    delta: number,
-    gamma: number,
-    theta: number,
-    vega: number,
-    rho: number,
-    timeValue: number,
-    intrinsicValue: number,
-    totalValue: number,
-    returnValue: string,
-    underlyingPrice: number,
-    timeToExpiration: number
-  ): OptionsContract => ({
-    id,
-    symbol,
-    type,
-    strike,
-    expiration,
-    bid,
-    ask,
-    last,
-    volume,
-    openInterest,
-    impliedVolatility,
-    delta,
-    gamma,
-    theta,
-    vega,
-    rho,
-    timeValue,
-    intrinsicValue,
-    totalValue,
-    return: returnValue,
-    underlyingPrice,
-    timeToExpiration,
-    greeks: calculateGreekRanges(delta, gamma, theta, vega, rho, underlyingPrice, strike, timeToExpiration, impliedVolatility, type)
-  });
-
-  // Mock options contracts data with Greek analytics
-  const mockOptionsContracts: OptionsContract[] = [
-    createContract('1', 'AAPL', 'CALL', 190, '2025-01-17', 5.25, 5.35, 5.30, 1250, 8920, 0.28, 0.65, 0.012, -0.08, 0.15, 0.05, 5.30, 0, 530, '+18.2%', 189.95, 0.15),
-    createContract('2', 'TSLA', 'PUT', 250, '2025-01-20', 8.70, 8.80, 8.75, 890, 5430, 0.32, -0.45, 0.008, -0.12, 0.22, -0.03, 8.75, 0, 875, '+24.8%', 248.50, 0.18),
-    createContract('3', 'NVDA', 'CALL', 900, '2025-01-17', 12.25, 12.35, 12.30, 2100, 12560, 0.35, 0.72, 0.006, -0.15, 0.18, 0.08, 12.30, 0, 1230, '+35.7%', 875.28, 0.15),
-    createContract('4', 'MSFT', 'CALL', 380, '2025-01-24', 6.80, 6.90, 6.85, 680, 4560, 0.26, 0.58, 0.010, -0.09, 0.14, 0.06, 6.85, 0, 685, '+15.4%', 378.85, 0.22),
-    createContract('5', 'AMZN', 'PUT', 140, '2025-01-17', 4.15, 4.25, 4.20, 320, 2890, 0.30, -0.35, 0.015, -0.06, 0.12, -0.02, 4.20, 0, 420, '-5.3%', 145.86, 0.15),
-    createContract('6', 'GOOGL', 'CALL', 145, '2025-01-17', 7.55, 7.65, 7.60, 1450, 8920, 0.33, 0.68, 0.011, -0.11, 0.16, 0.07, 7.60, 0, 760, '+28.9%', 142.56, 0.15),
-    createContract('7', 'SPY', 'CALL', 450, '2025-01-17', 3.25, 3.35, 3.30, 3450, 15620, 0.22, 0.55, 0.008, -0.05, 0.10, 0.04, 3.30, 0, 330, '+12.1%', 445.50, 0.15),
-    createContract('8', 'QQQ', 'PUT', 380, '2025-01-20', 2.80, 2.90, 2.85, 2100, 7890, 0.25, -0.42, 0.009, -0.07, 0.11, -0.03, 2.85, 0, 285, '+8.7%', 375.20, 0.18)
-  ];
-
-  // Filter options contracts based on criteria
-  const filterContracts = (contracts: OptionsContract[], filters: ScannerFilters): OptionsContract[] => {
-    return contracts.filter(contract => {
-      // Symbol filter
-      if (filters.symbol && !contract.symbol.toLowerCase().includes(filters.symbol.toLowerCase())) {
-        return false;
-      }
-
-      // Price filters
-      if (filters.minPrice && contract.last < parseFloat(filters.minPrice)) {
-        return false;
-      }
-      if (filters.maxPrice && contract.last > parseFloat(filters.maxPrice)) {
-        return false;
-      }
-
-      // Volume filter
-      if (filters.minVolume && contract.volume < parseInt(filters.minVolume)) {
-        return false;
-      }
-
-      // Open Interest filter
-      if (filters.minOpenInterest && contract.openInterest < parseInt(filters.minOpenInterest)) {
-        return false;
-      }
-
-      // Delta filters
-      if (filters.minDelta && contract.delta < parseFloat(filters.minDelta)) {
-        return false;
-      }
-      if (filters.maxDelta && contract.delta > parseFloat(filters.maxDelta)) {
-        return false;
-      }
-
-      // Gamma filters
-      if (filters.minGamma && contract.gamma < parseFloat(filters.minGamma)) {
-        return false;
-      }
-      if (filters.maxGamma && contract.gamma > parseFloat(filters.maxGamma)) {
-        return false;
-      }
-
-      // Theta filters
-      if (filters.minTheta && contract.theta < parseFloat(filters.minTheta)) {
-        return false;
-      }
-      if (filters.maxTheta && contract.theta > parseFloat(filters.maxTheta)) {
-        return false;
-      }
-
-      // Vega filters
-      if (filters.minVega && contract.vega < parseFloat(filters.minVega)) {
-        return false;
-      }
-      if (filters.maxVega && contract.vega > parseFloat(filters.maxVega)) {
-        return false;
-      }
-
-      // IV filters
-      if (filters.minIV && contract.impliedVolatility < parseFloat(filters.minIV)) {
-        return false;
-      }
-      if (filters.maxIV && contract.impliedVolatility > parseFloat(filters.maxIV)) {
-        return false;
-      }
-
-      // Contract type filter
-      if (filters.contractType !== 'ALL' && contract.type !== filters.contractType) {
-        return false;
-      }
-
-      return true;
-    });
-  };
-
-  // Real-time filtering - no manual scan needed
-  useEffect(() => {
-    const filteredResults = filterContracts(mockOptionsContracts, filters);
-    setResults(filteredResults);
-  }, [filters]);
-
-  // Update filter
-  const updateFilter = (key: keyof ScannerFilters, value: string) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-
-  // Heat Map Component for Scanner Parameters
-  const ScannerHeatMap: React.FC<{
-    filters: ScannerFilters;
-    onFilterChange: (key: keyof ScannerFilters, value: string) => void;
-    results: OptionsContract[];
-  }> = ({ filters, onFilterChange, results }) => {
-    const [selectedCell, setSelectedCell] = useState<{row: number, col: number} | null>(null);
-    
-    // Define heat map parameters
-    const parameters = [
-      { key: 'symbol', label: 'Symbol', type: 'text', placeholder: 'AAPL, TSLA...' },
-      { key: 'minPrice', label: 'Min Price', type: 'number', placeholder: '0.00' },
-      { key: 'maxPrice', label: 'Max Price', type: 'number', placeholder: '100.00' },
-      { key: 'minVolume', label: 'Min Volume', type: 'number', placeholder: '100' },
-      { key: 'minOpenInterest', label: 'Min OI', type: 'number', placeholder: '50' },
-      { key: 'minDelta', label: 'Min Delta', type: 'number', placeholder: '-1.0' },
-      { key: 'maxDelta', label: 'Max Delta', type: 'number', placeholder: '1.0' },
-      { key: 'minGamma', label: 'Min Gamma', type: 'number', placeholder: '0.000' },
-      { key: 'maxGamma', label: 'Max Gamma', type: 'number', placeholder: '0.100' },
-      { key: 'minTheta', label: 'Min Theta', type: 'number', placeholder: '-1.0' },
-      { key: 'maxTheta', label: 'Max Theta', type: 'number', placeholder: '0.0' },
-      { key: 'minVega', label: 'Min Vega', type: 'number', placeholder: '0.00' },
-      { key: 'maxVega', label: 'Max Vega', type: 'number', placeholder: '1.00' },
-      { key: 'minIV', label: 'Min IV', type: 'number', placeholder: '0.10' },
-      { key: 'maxIV', label: 'Max IV', type: 'number', placeholder: '1.00' },
-    ];
-
-    // Contract types for future use
-    // const contractTypes = [
-    //   { key: 'ALL', label: 'All', color: 'bg-gray-500' },
-    //   { key: 'CALL', label: 'Calls', color: 'bg-green-500' },
-    //   { key: 'PUT', label: 'Puts', color: 'bg-red-500' },
-    // ];
-
-    // Calculate heat intensity based on filter values
-    const getHeatIntensity = (param: any) => {
-      const value = filters[param.key as keyof ScannerFilters];
-      if (!value) return 0;
-      
-      // Convert value to intensity (0-1)
-      if (param.type === 'number') {
-        const numValue = parseFloat(value);
-        if (isNaN(numValue)) return 0;
-        
-        // Normalize based on parameter type
-        switch (param.key) {
-          case 'minPrice':
-          case 'maxPrice':
-            return Math.min(numValue / 50, 1);
-          case 'minVolume':
-          case 'minOpenInterest':
-            return Math.min(numValue / 1000, 1);
-          case 'minDelta':
-          case 'maxDelta':
-            return Math.min(Math.abs(numValue), 1);
-          case 'minGamma':
-          case 'maxGamma':
-            return Math.min(numValue * 10, 1);
-          case 'minTheta':
-          case 'maxTheta':
-            return Math.min(Math.abs(numValue), 1);
-          case 'minVega':
-          case 'maxVega':
-            return Math.min(numValue, 1);
-          case 'minIV':
-          case 'maxIV':
-            return Math.min(numValue, 1);
-          default:
-            return 0.5;
-        }
-      }
-      
-      return value.length > 0 ? 0.8 : 0;
-    };
-
-    const getHeatColor = (intensity: number) => {
-      if (intensity === 0) return 'bg-gray-800';
-      if (intensity < 0.3) return 'bg-blue-900';
-      if (intensity < 0.6) return 'bg-yellow-600';
-      if (intensity < 0.8) return 'bg-orange-500';
-      return 'bg-red-500';
-    };
+  const renderMessage = (message: ChatMessage) => {
+    if (message.type === 'user') {
+      return (
+        <div className="flex justify-end mb-4">
+          <div className="bg-blue-600 text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs lg:max-w-md">
+            <p className="text-sm">{message.content}</p>
+          </div>
+        </div>
+      );
+    }
 
     return (
-      <div className="space-y-4">
-        {/* Search Bar */}
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-500" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search parameters..."
-            className="block w-full pl-10 pr-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          />
-        </div>
-
-        {/* Heat Map Grid */}
-        <div className="grid grid-cols-4 gap-2">
-          {parameters.map((param, index) => {
-            const intensity = getHeatIntensity(param);
-            const heatColor = getHeatColor(intensity);
-            const isSelected = selectedCell?.row === Math.floor(index / 4) && selectedCell?.col === index % 4;
-            
-            return (
-              <div
-                key={param.key}
-                className={`relative p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                  isSelected ? 'border-blue-500' : 'border-transparent'
-                } ${heatColor} hover:scale-105`}
-                onClick={() => setSelectedCell({ row: Math.floor(index / 4), col: index % 4 })}
-              >
-                <div className="text-center">
-                  <div className="text-xs text-gray-300 font-medium mb-1">{param.label}</div>
-                  <div className="text-xs text-white font-bold">
-                    {filters[param.key as keyof ScannerFilters] || '—'}
-                  </div>
-                </div>
-                
-                {/* Intensity indicator */}
-                <div className="absolute top-1 right-1">
-                  <div className={`w-2 h-2 rounded-full ${
-                    intensity > 0.8 ? 'bg-white' : 
-                    intensity > 0.6 ? 'bg-yellow-200' : 
-                    intensity > 0.3 ? 'bg-blue-200' : 'bg-gray-400'
-                  }`}></div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Selected Parameter Input */}
-        {selectedCell && (
-          <div className="p-4 bg-gray-800 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white font-medium">
-                {parameters[selectedCell.row * 4 + selectedCell.col]?.label}
-              </span>
-              <button
-                onClick={() => setSelectedCell(null)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <input
-              type={parameters[selectedCell.row * 4 + selectedCell.col]?.type || 'text'}
-              placeholder={parameters[selectedCell.row * 4 + selectedCell.col]?.placeholder}
-              value={filters[parameters[selectedCell.row * 4 + selectedCell.col]?.key as keyof ScannerFilters] || ''}
-              onChange={(e) => onFilterChange(
-                parameters[selectedCell.row * 4 + selectedCell.col]?.key as keyof ScannerFilters, 
-                e.target.value
-              )}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            
-            {/* Live Results Preview */}
-            {results.length > 0 && (
-              <div className="mt-3 p-3 bg-gray-800 rounded-lg">
-                <div className="text-xs text-gray-400 mb-2">Live Results ({results.length} contracts)</div>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
-                  {results.slice(0, 5).map((contract) => (
-                    <div key={contract.id} className="flex items-center justify-between text-xs">
-                      <span className="text-white font-medium">{contract.symbol} ${contract.strike} {contract.type}</span>
-                      <span className="text-green-400">${contract.last.toFixed(2)}</span>
+      <div className="flex justify-start mb-4">
+        <div className="bg-[#2a2a2a] text-white rounded-2xl rounded-bl-md px-4 py-3 max-w-xs lg:max-w-2xl">
+          <div className="flex items-start gap-2 mb-2">
+            <Brain className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm whitespace-pre-line">{message.content}</p>
+              
+              {message.data && (message.data.type === 'volatile_stocks' || message.data.type === 'high_delta_options') && (
+                <div className="mt-4 space-y-3">
+                  {message.data.stocks.map((stock: VolatileStock) => (
+                    <div 
+                      key={stock.symbol} 
+                      className="bg-[#1a1a1a] rounded-lg p-3 border border-[#3a3a3a] cursor-pointer hover:border-blue-500/50 transition-colors"
+                      onClick={() => setHeatmapModal({
+                        isOpen: true,
+                        symbol: stock.symbol,
+                        companyName: stock.name
+                      })}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-white">{stock.symbol}</span>
+                          <span className="text-xs text-gray-400">{stock.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="w-4 h-4 text-green-500" />
+                          <span className="text-sm font-semibold text-green-500">
+                            {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-400">Price:</span>
+                          <span className="text-white ml-1">${stock.price.toFixed(2)}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Volatility:</span>
+                          <span className="text-yellow-400 ml-1">{(stock.volatility * 100).toFixed(1)}%</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Options:</span>
+                          <span className="text-blue-400 ml-1">{stock.options.totalVolume}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">IV:</span>
+                          <span className="text-purple-400 ml-1">{(stock.options.avgIV * 100).toFixed(1)}%</span>
+                        </div>
+                      </div>
+                      {message.data.type === 'high_delta_options' && (
+                        <div className="mt-2 pt-2 border-t border-[#3a3a3a]">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-400">Delta Sensitivity:</span>
+                            <span className="text-orange-400 font-semibold">High</span>
+                          </div>
+                          <div className="flex items-center justify-between text-xs mt-1">
+                            <span className="text-gray-400">Calls vs Puts:</span>
+                            <span className="text-green-400">{stock.options.calls} / {stock.options.puts}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
-                  {results.length > 5 && (
-                    <div className="text-xs text-gray-500 text-center">+{results.length - 5} more...</div>
-                  )}
                 </div>
-              </div>
-            )}
-          </div>
-        )}
+              )}
 
+              {message.data && message.data.type === 'stock_analysis' && (
+                <div className="mt-4 bg-[#1a1a1a] rounded-lg p-3 border border-[#3a3a3a]">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Activity className="w-4 h-4 text-blue-400" />
+                    <span className="font-semibold text-white">{message.data.stock.symbol} Analysis</span>
+                  </div>
+                  <div className="text-xs text-gray-300">
+                    Real-time data • Updated just now
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
 
-  // Greek Range Display Component (for future use)
-  // const GreekRangeDisplay: React.FC<{ 
-  //   greek: GreekRange; 
-  //   label: string; 
-  //   formatValue: (value: number) => string;
-  //   color: string;
-  // }> = ({ greek, label, formatValue, color }) => {
-  //   const range = greek.max - greek.min;
-  //   const modePosition = range > 0 ? ((greek.mode - greek.min) / range) * 100 : 50;
-  //   
-  //   return (
-  //     <div className="space-y-1">
-  //       <div className="flex items-center justify-between text-xs">
-  //         <span className="text-gray-400">{label}</span>
-  //         <div className="flex items-center gap-1">
-  //           <span className="text-white font-medium">{formatValue(greek.mode)}</span>
-  //           <div className="group relative">
-  //             <Info className="h-3 w-3 text-gray-500 cursor-help" />
-  //             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-  //               Mode: {formatValue(greek.mode)}<br/>
-  //               Range: {formatValue(greek.min)} - {formatValue(greek.max)}
-  //             </div>
-  //           </div>
-  //         </div>
-  //       </div>
-  //       <div className="relative h-2 bg-gray-700 rounded-full overflow-hidden">
-  //         <div 
-  //           className={`h-full ${color} opacity-30`}
-  //           style={{ width: '100%' }}
-  //         />
-  //         <div 
-  //           className={`absolute top-0 h-full w-1 ${color} opacity-80`}
-  //           style={{ left: `${Math.max(0, Math.min(100, modePosition))}%` }}
-  //         />
-  //       </div>
-  //       <div className="flex justify-between text-xs text-gray-500">
-  //         <span>{formatValue(greek.min)}</span>
-  //         <span>{formatValue(greek.max)}</span>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#1a1a1a] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-[#1a1a1a] rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[#2a2a2a]">
-          <div className="flex items-center gap-2">
-            <Eye className="h-5 w-5 text-green-500" />
-            <h3 className="text-lg font-semibold text-white">Options Scanner</h3>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Brain className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">AI Options Scanner</h3>
+              <p className="text-xs text-gray-400">Powered by General Exchange AI</p>
+            </div>
           </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-[#2a2a2a] rounded-lg transition-colors"
           >
-            <X className="h-5 w-5 text-gray-400" />
+            <X className="w-5 h-5 text-gray-400" />
           </button>
         </div>
 
-        {/* Single Column Heat Map */}
-        <div className="h-[calc(90vh-80px)] overflow-y-auto">
-          <div className="p-4">
-            <ScannerHeatMap
-              filters={filters}
-              onFilterChange={updateFilter}
-              results={results}
-            />
+        {/* Input Area - Moved to Top */}
+        <div className="p-4 border-b border-[#2a2a2a]">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={currentInput}
+                onChange={(e) => setCurrentInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Ask me about volatile stocks, options volume, or specific strategies..."
+                className="w-full bg-[#2a2a2a] text-white rounded-xl px-4 py-3 pr-12 border border-[#3a3a3a] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!currentInput.trim() || isLoading}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg transition-colors"
+              >
+                <Send className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
+          
+          {/* Quick Actions */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              'Most volatile stocks',
+              'High volume options',
+              'Best call options',
+              'Tesla analysis',
+              'Put options for hedging'
+            ].map((suggestion) => (
+              <button
+                key={suggestion}
+                onClick={() => setCurrentInput(suggestion)}
+                className="px-3 py-1 bg-[#2a2a2a] hover:bg-[#3a3a3a] text-gray-300 text-xs rounded-full transition-colors"
+              >
+                {suggestion}
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* Chat Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {messages.map((message) => (
+            <div key={message.id}>
+              {renderMessage(message)}
+            </div>
+          ))}
+          
+          {isLoading && (
+            <div className="flex justify-start mb-4">
+              <div className="bg-[#2a2a2a] text-white rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-blue-400" />
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Greeks Heatmap Modal */}
+        <GreeksHeatmapModal
+          isOpen={heatmapModal.isOpen}
+          onClose={() => setHeatmapModal({ isOpen: false, symbol: '', companyName: '' })}
+          symbol={heatmapModal.symbol}
+          companyName={heatmapModal.companyName}
+        />
       </div>
     </div>
   );

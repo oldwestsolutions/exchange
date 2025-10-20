@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { GreeksHeatmapModal } from './GreeksHeatmapModal';
 
 interface WatchlistOption {
   id: number;
@@ -22,6 +23,11 @@ export const WatchlistCarousel: React.FC<WatchlistCarouselProps> = ({ options })
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(6);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [heatmapModal, setHeatmapModal] = useState<{isOpen: boolean, symbol: string, companyName: string}>({
+    isOpen: false,
+    symbol: '',
+    companyName: ''
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const itemsPerPageOptions = [3, 6, 12, 24];
@@ -145,6 +151,11 @@ export const WatchlistCarousel: React.FC<WatchlistCarouselProps> = ({ options })
             return (
               <div
                 key={option.id}
+                onClick={() => setHeatmapModal({
+                  isOpen: true,
+                  symbol: option.symbol,
+                  companyName: `${option.symbol} Corporation`
+                })}
                 className={`rounded-lg p-3 sm:p-4 cursor-pointer group border-2 transition-all ${
                   isProfit
                     ? 'bg-green-500/5 border-green-500/30 hover:border-green-500'
@@ -177,6 +188,14 @@ export const WatchlistCarousel: React.FC<WatchlistCarouselProps> = ({ options })
           })}
         </div>
       </div>
+
+      {/* Greeks Heatmap Modal */}
+      <GreeksHeatmapModal
+        isOpen={heatmapModal.isOpen}
+        onClose={() => setHeatmapModal({ isOpen: false, symbol: '', companyName: '' })}
+        symbol={heatmapModal.symbol}
+        companyName={heatmapModal.companyName}
+      />
     </div>
   );
 };
