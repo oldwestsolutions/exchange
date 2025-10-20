@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Search, Eye, Info } from 'lucide-react';
+import { X, Search, Eye } from 'lucide-react';
 
 interface OptionsScannerProps {
   onClose: () => void;
