@@ -90,11 +90,11 @@ export const Pricing: React.FC = () => {
         title="Pricing Plans - Affordable Trading Solutions"
         description="Transparent pricing for professional traders. Choose from Starter ($49/mo), Professional ($149/mo), or Enterprise ($499/mo) plans. 14-day free trial, no credit card required."
         keywords="trading platform pricing, trading software cost, options trading subscription, professional trading plans, trading platform cost"
-        canonical="https://bridgeobserver.com/pricing"
+        canonical="https://generalexchange.com/pricing"
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'Product',
-          name: 'Bridge Observer Subscription',
+          name: 'General Exchange Subscription',
           offers: [
             {
               '@type': 'Offer',
@@ -309,7 +309,7 @@ export const Pricing: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>

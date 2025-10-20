@@ -44,7 +44,7 @@ export const RequestAccess: React.FC = () => {
         <div className="py-6 px-4">
           <Link to="/" className="inline-block">
             <span className="text-2xl font-serif font-bold text-white hover:text-blue-400 transition-colors">
-              Bridge Observer
+              General Exchange
             </span>
           </Link>
         </div>
@@ -59,7 +59,7 @@ export const RequestAccess: React.FC = () => {
                 Request Received!
               </h2>
               <p className="text-gray-400 mb-8">
-                Thank you for your interest in Bridge Observer. Our team will review your request and contact you within 24-48 hours.
+                Thank you for your interest in General Exchange. Our team will review your request and contact you within 24-48 hours.
               </p>
               <Link
                 to="/"
@@ -75,7 +75,7 @@ export const RequestAccess: React.FC = () => {
         <footer className="border-t border-[#2a2a2a] bg-[#0a0a0a] py-6">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center text-gray-500 text-sm">
-              © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+              © {new Date().getFullYear()} General Exchange. All rights reserved.
             </div>
           </div>
         </footer>
@@ -86,10 +86,10 @@ export const RequestAccess: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
       <SEO 
-        title="Request Platform Access - Join Bridge Observer"
-        description="Request access to Bridge Observer's professional options trading platform. Connect with our team to start trading smarter with AI-powered risk management tools."
-        keywords="request trading platform access, join Bridge Observer, trading platform signup, professional trading account"
-        canonical="https://bridgeobserver.com/request-access"
+        title="Request Platform Access - Join General Exchange"
+        description="Request access to General Exchange's professional options trading platform. Connect with our team to start trading smarter with AI-powered risk management tools."
+        keywords="request trading platform access, join General Exchange, trading platform signup, professional trading account"
+        canonical="https://generalexchange.com/request-access"
       />
       {/* Logo Header */}
       <div className="py-6 px-4">
@@ -110,7 +110,7 @@ export const RequestAccess: React.FC = () => {
                 Request Platform Access
               </h1>
               <p className="text-sm sm:text-base text-gray-400">
-                Join thousands of professional traders using Bridge Observer
+                Join thousands of professional traders using General Exchange
               </p>
             </div>
 

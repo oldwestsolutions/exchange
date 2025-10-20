@@ -1,12 +1,14 @@
-# Bridge - News & Portfolio Dashboard
+# General Exchange - News & Portfolio Dashboard
 
-A modern TypeScript React application featuring a news homepage, login system, and Robinhood-style investment dashboard.
+A modern TypeScript React application featuring a professional trading platform with AI-powered risk management, news homepage, login system, and investment dashboard.
 
 ## Features
 
-- **Homepage**: Google News style layout with search functionality and dark/light mode
+- **Professional Trading Platform**: AI-powered risk management for options trading professionals
+- **Homepage**: Professional landing page with Bloomberg/Reuters-level positioning
 - **Login Page**: Secure login form with validation
 - **Dashboard**: Investment portfolio tracker with charts and transaction history
+- **Interactive Brokers Integration**: Connect with professional trading accounts
 - **Fully Responsive**: Mobile-first design that works on all devices
 - **Dark Mode**: Toggle between light and dark themes
 
@@ -48,11 +50,27 @@ src/
 
 ## Available Routes
 
-- `/` - Homepage (News)
+- `/` - Homepage (Professional Trading Platform)
 - `/login` - Login page
 - `/dashboard` - Portfolio dashboard
+- `/features` - Platform features
+- `/pricing` - Subscription plans
+- `/our-team` - Meet the team
+- `/documentation` - User documentation
+- `/help-center` - Support and FAQ
+- `/community` - Trading community
+- `/request-access` - Request platform access
 
 ## Mock Data
 
-The application uses placeholder data stored in the `src/data/` directory. Replace this with API calls when integrating with a backend.
+The application uses placeholder data stored in the `src/data/` directory. Replace this with API calls when integrating with Interactive Brokers and other trading APIs.
+
+## Professional Trading Features
+
+- **AI-Powered Risk Management**: Advanced algorithms for portfolio analysis
+- **Real-time Market Data**: Live market analysis and alerts
+- **Options Trading Tools**: Professional-grade options analysis
+- **Interactive Brokers Integration**: Seamless connection to trading accounts
+- **Risk Alerts**: Automated notifications for portfolio risks
+- **Trade Optimization**: AI-suggested trade improvements
 

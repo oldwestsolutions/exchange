@@ -60,7 +60,7 @@ export const Documentation: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">Documentation</h1>
             <p className="text-xl text-gray-400">
-              Everything you need to know about using Bridge Observer
+              Everything you need to know about using General Exchange
             </p>
           </div>
         </section>
@@ -123,7 +123,7 @@ export const Documentation: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>

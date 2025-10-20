@@ -164,7 +164,7 @@ export const Dashboard: React.FC = () => {
       }`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-12">
           <div className="flex justify-between items-center h-14 sm:h-16">
-            <span className="text-lg sm:text-2xl font-serif font-bold text-white">BridgeObserver</span>
+            <span className="text-lg sm:text-2xl font-serif font-bold text-white">General Exchange</span>
             <ProfileMenu />
           </div>
         </div>

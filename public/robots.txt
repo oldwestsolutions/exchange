@@ -1,9 +1,9 @@
-# robots.txt for Bridge Observer
+# robots.txt for General Exchange
 User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://bridgeobserver.com/sitemap.xml
+Sitemap: https://generalexchange.com/sitemap.xml
 
 # Crawl-delay (optional, helps prevent server overload)
 Crawl-delay: 1

@@ -17,23 +17,23 @@ interface SEOProps {
 }
 
 export const SEO: React.FC<SEOProps> = ({
-  title = 'Bridge Observer - Algorithmic Trade Engine',
+  title = 'General Exchange - Algorithmic Trade Engine',
   description = 'Professional algorithmic risk management platform for options trading. Connect with Interactive Brokers. Real-time AI analysis, risk alerts, and trade optimization for professional traders.',
   keywords = 'options trading, algorithmic trading, risk management, trading platform, Interactive Brokers, AI trading, options analysis, trading algorithms, professional trading, trading software, financial technology, fintech, trading risk, portfolio management, options strategy',
-  ogImage = 'https://bridgeobserver.com/og-image.jpg',
+  ogImage = 'https://generalexchange.com/og-image.jpg',
   ogType = 'website',
   canonical,
   noindex = false,
   structuredData
 }) => {
-  const siteUrl = 'https://bridgeobserver.com';
-  const fullTitle = title.includes('Bridge Observer') ? title : `${title} | Bridge Observer`;
+  const siteUrl = 'https://generalexchange.com';
+  const fullTitle = title.includes('General Exchange') ? title : `${title} | General Exchange`;
   const canonicalUrl = canonical || siteUrl;
 
   const defaultStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Bridge Observer',
+    name: 'General Exchange',
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Web',
     offers: {
@@ -69,7 +69,7 @@ export const SEO: React.FC<SEOProps> = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:site_name" content="Bridge Observer" />
+      <meta property="og:site_name" content="General Exchange" />
       <meta property="og:locale" content="en_US" />
       
       {/* Twitter Card */}
@@ -78,11 +78,11 @@ export const SEO: React.FC<SEOProps> = ({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
-      <meta name="twitter:creator" content="@bridgeobserver" />
+      <meta name="twitter:creator" content="@generalexchange" />
       
       {/* Additional SEO Tags */}
-      <meta name="author" content="Bridge Observer" />
-      <meta name="publisher" content="Bridge Observer" />
+      <meta name="author" content="General Exchange" />
+      <meta name="publisher" content="General Exchange" />
       <meta name="language" content="English" />
       <meta name="revisit-after" content="7 days" />
       

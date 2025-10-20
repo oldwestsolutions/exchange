@@ -1,5 +1,5 @@
 /**
- * Our Team page - showcasing the Bridge Observer team
+ * Our Team page - showcasing the General Exchange team
  */
 
 import React from 'react';
@@ -149,7 +149,7 @@ export const OurTeam: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>

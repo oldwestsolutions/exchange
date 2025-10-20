@@ -129,9 +129,9 @@ export const Features: React.FC = () => {
     <div className="min-h-screen bg-[#0a0a0a]">
       <SEO 
         title="Features - Professional Trading Tools"
-        description="Discover Bridge Observer's comprehensive features: AI-powered risk analysis, real-time alerts, near-term trade optimization, advanced analytics, and Interactive Brokers integration."
+        description="Discover General Exchange's comprehensive features: AI-powered risk analysis, real-time alerts, near-term trade optimization, advanced analytics, and Interactive Brokers integration."
         keywords="trading features, AI risk analysis, trading alerts, portfolio analytics, options trading tools, risk management features, trade optimization"
-        canonical="https://bridgeobserver.com/features"
+        canonical="https://generalexchange.com/features"
       />
       <Navbar showSearch={false} />
       
@@ -264,7 +264,7 @@ export const Features: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>

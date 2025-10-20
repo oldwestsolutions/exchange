@@ -56,7 +56,7 @@ export const Login: React.FC = () => {
       <div className="py-6 px-4">
         <Link to="/" className="inline-block">
           <span className="text-2xl font-serif font-bold text-white hover:text-blue-400 transition-colors">
-            Bridge Observer
+            General Exchange
           </span>
         </Link>
       </div>
@@ -71,7 +71,7 @@ export const Login: React.FC = () => {
               Welcome Back
             </h2>
             <p className="text-sm sm:text-base text-gray-400">
-              Sign in to Bridge Observer
+              Sign in to General Exchange
             </p>
           </div>
 
@@ -183,7 +183,7 @@ export const Login: React.FC = () => {
       <footer className="border-t border-[#2a2a2a] bg-[#0a0a0a] py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+            © {new Date().getFullYear()} General Exchange. All rights reserved.
           </div>
         </div>
       </footer>

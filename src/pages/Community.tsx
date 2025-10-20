@@ -23,7 +23,7 @@ export const Community: React.FC = () => {
       time: '2 hours ago'
     },
     {
-      title: 'How I used Bridge Observer to improve my win rate by 40%',
+      title: 'How I used General Exchange to improve my win rate by 40%',
       author: 'QuantJess',
       replies: 156,
       likes: 892,
@@ -186,7 +186,7 @@ export const Community: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>

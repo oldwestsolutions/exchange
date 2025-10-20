@@ -51,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ searchQuery = '', onSearchChange
         <div className="flex justify-between items-center gap-2 sm:gap-4 h-14 sm:h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <span className="text-lg sm:text-2xl font-serif font-bold text-white">BridgeObserver</span>
+            <span className="text-lg sm:text-2xl font-serif font-bold text-white">General Exchange</span>
           </div>
 
           {/* Search Bar (only on homepage) */}

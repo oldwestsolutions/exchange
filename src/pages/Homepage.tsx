@@ -1,6 +1,6 @@
 /**
  * Homepage component - Professional landing page
- * Positioning Bridge Observer as a Bloomberg/Reuters-level platform
+ * Positioning General Exchange as a Bloomberg/Reuters-level platform
  * with AI-powered risk management for near-term trading
  */
 
@@ -21,14 +21,14 @@ export const Homepage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <SEO 
-        title="Bridge Observer - Algorithmic Trade Engine"
+        title="General Exchange - Algorithmic Trade Engine"
         description="Professional algorithmic risk management platform for options trading professionals. Connect with Interactive Brokers for real-time AI analysis, risk alerts, and trade optimization."
         keywords="options trading platform, algorithmic trading, risk management software, Interactive Brokers integration, AI trading tools, options analysis, trading algorithms, professional trading platform, options strategy, trading risk management"
-        canonical="https://bridgeobserver.com/"
+        canonical="https://generalexchange.com/"
         structuredData={{
           '@context': 'https://schema.org',
           '@type': 'SoftwareApplication',
-          name: 'Bridge Observer',
+          name: 'General Exchange',
           applicationCategory: 'FinanceApplication',
           operatingSystem: 'Web, iOS, Android',
           offers: {
@@ -67,7 +67,7 @@ export const Homepage: React.FC = () => {
                 </h1>
                 
                 <p className="text-lg sm:text-xl text-gray-400 leading-relaxed">
-                  Bridge Observer combines the depth of <span className="text-blue-400 font-semibold">Thomson Reuters</span>, 
+                  General Exchange combines the depth of <span className="text-blue-400 font-semibold">Thomson Reuters</span>, 
                   the insight of <span className="text-blue-400 font-semibold">Bloomberg</span>, and 
                   the clarity of <span className="text-blue-400 font-semibold">The New York Times</span> with 
                   advanced AI algorithms that help traders manage risk and make informed decisions in real-time.
@@ -102,7 +102,7 @@ export const Homepage: React.FC = () => {
                       <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
                     </div>
-                    <span className="text-xs text-gray-500 font-mono">BRIDGE_TERMINAL</span>
+                    <span className="text-xs text-gray-500 font-mono">GENERAL_EXCHANGE</span>
                   </div>
                   
                   {/* Terminal Content */}
@@ -169,7 +169,7 @@ export const Homepage: React.FC = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
               {/* Brand */}
               <div className="col-span-2 md:col-span-1">
-                <h3 className="text-2xl font-serif font-bold text-white mb-3">Bridge Observer</h3>
+                <h3 className="text-2xl font-serif font-bold text-white mb-3">General Exchange</h3>
                 <p className="text-gray-500 text-sm leading-relaxed mb-4">
                   Professional trading intelligence with AI-powered risk management
                 </p>
@@ -212,7 +212,7 @@ export const Homepage: React.FC = () => {
             {/* Bottom Bar */}
             <div className="border-t border-[#2a2a2a] pt-8 flex flex-col md:flex-row justify-between items-center">
               <p className="text-gray-500 text-sm mb-4 md:mb-0">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
               <div className="flex space-x-6 text-sm text-gray-500">
                 <a href="#" className="hover:text-blue-500 transition-colors">Privacy Policy</a>

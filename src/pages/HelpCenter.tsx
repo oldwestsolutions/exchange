@@ -12,7 +12,7 @@ export const HelpCenter: React.FC = () => {
 
   const faqs = [
     {
-      question: 'How do I get started with Bridge Observer?',
+      question: 'How do I get started with General Exchange?',
       answer: 'Getting started is easy! Sign up for an account, connect your trading accounts or manually add positions, and our AI will immediately start analyzing your portfolio for risks and opportunities.'
     },
     {
@@ -56,7 +56,7 @@ export const HelpCenter: React.FC = () => {
     {
       icon: Mail,
       title: 'Email Support',
-      description: 'support@bridgeobserver.com',
+      description: 'support@generalexchange.com',
       action: 'Send Email',
       available: 'Response within 2 hours'
     },
@@ -158,7 +158,7 @@ export const HelpCenter: React.FC = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} Bridge Observer. All rights reserved.
+                © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>
