@@ -37,7 +37,7 @@ export const getTradeInsights = async (): Promise<TradeInsightsResponse> => {
 };
 
 // Real WebSocket implementation - no mock data
-export const createTradeInsightsStream = (onUpdate: (data: TradeInsightsResponse) => void) => {
+export const createTradeInsightsStream = (_onUpdate: (data: TradeInsightsResponse) => void) => {
   // TODO: Replace with real WebSocket connection when backend is connected
   // This will be implemented when the actual trading API is connected
   
