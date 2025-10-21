@@ -91,7 +91,7 @@ export const StockSearchResults: React.FC<StockSearchResultsProps> = ({ query })
     return (
       <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg shadow-xl overflow-hidden z-50">
         <div className="max-h-64 overflow-y-auto">
-          {matchingStocks.map((matchStock, index) => {
+          {matchingStocks.map((matchStock) => {
             const isPositive = matchStock.change >= 0;
             return (
               <div 

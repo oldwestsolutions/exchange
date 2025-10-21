@@ -3,7 +3,7 @@
  * Shows company bio, recent news, and options chain
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, TrendingUp, TrendingDown, Calendar, Users, MapPin, Globe, ExternalLink, Activity, Zap } from 'lucide-react';
 
@@ -52,7 +52,6 @@ export const CompanyDetails: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'overview' | 'options'>('overview');
   const [activeGreek, setActiveGreek] = useState<'theta' | 'gamma' | 'delta'>('theta');
-  const [isLoadingGreeks, setIsLoadingGreeks] = useState(false);
 
   // Greeks calculation functions
   const calculateGreeks = (option: OptionContract, currentPrice: number) => {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, TrendingUp, AlertTriangle, Zap, Brain, MessageSquare, Eye, DollarSign, Activity } from 'lucide-react';
+import { X, Send, TrendingUp, Brain, Activity } from 'lucide-react';
 import { GreeksHeatmapModal } from './GreeksHeatmapModal';
 
 interface OptionsScannerProps {
@@ -32,25 +32,6 @@ interface VolatileStock {
 }
 
 export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: '1',
-      type: 'assistant',
-      content: 'Here are the stocks with the highest absolute Delta values - these are the most sensitive to underlying price movements:',
-      timestamp: new Date(),
-      data: { type: 'high_delta_options', stocks: volatileStocks.sort((a, b) => b.options.avgIV - a.options.avgIV) }
-    }
-  ]);
-
-  const [currentInput, setCurrentInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [heatmapModal, setHeatmapModal] = useState<{isOpen: boolean, symbol: string, companyName: string}>({
-    isOpen: false,
-    symbol: '',
-    companyName: ''
-  });
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
   // Mock volatile stocks data
   const volatileStocks: VolatileStock[] = [
     {
@@ -104,6 +85,25 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
       options: { calls: 950, puts: 750, totalVolume: '1.7M', avgIV: 0.42 }
     }
   ];
+
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: '1',
+      type: 'assistant',
+      content: 'Here are the stocks with the highest absolute Delta values - these are the most sensitive to underlying price movements:',
+      timestamp: new Date(),
+      data: { type: 'high_delta_options', stocks: volatileStocks.sort((a, b) => b.options.avgIV - a.options.avgIV) }
+    }
+  ]);
+
+  const [currentInput, setCurrentInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [heatmapModal, setHeatmapModal] = useState<{isOpen: boolean, symbol: string, companyName: string}>({
+    isOpen: false,
+    symbol: '',
+    companyName: ''
+  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -176,8 +176,10 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
 
     if (lowerInput.includes('tesla') || lowerInput.includes('tsla')) {
       const tesla = volatileStocks.find(s => s.symbol === 'TSLA');
+      if (!tesla) return { content: 'Tesla data not found.' };
+      
       return {
-        content: `Tesla (TSLA) Analysis:\n\n• Current Price: $${tesla?.price}\n• Change: ${tesla?.changePercent > 0 ? '+' : ''}${tesla?.changePercent}%\n• Volatility: ${tesla?.volatility * 100}%\n• Options Volume: ${tesla?.options.totalVolume}\n• Average IV: ${tesla?.options.avgIV * 100}%\n\nHigh volatility makes TSLA great for options trading!`,
+        content: `Tesla (TSLA) Analysis:\n\n• Current Price: $${tesla.price}\n• Change: ${tesla.changePercent > 0 ? '+' : ''}${tesla.changePercent}%\n• Volatility: ${tesla.volatility * 100}%\n• Options Volume: ${tesla.options.totalVolume}\n• Average IV: ${tesla.options.avgIV * 100}%\n\nHigh volatility makes TSLA great for options trading!`,
         data: { type: 'stock_analysis', stock: tesla }
       };
     }
