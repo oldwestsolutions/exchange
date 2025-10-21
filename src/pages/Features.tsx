@@ -1,276 +1,528 @@
 /**
- * Features page - comprehensive overview of platform features
+ * Features page - Learn More about General Exchange
+ * Comprehensive overview of the algorithmic trading platform
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar } from '../components/Navbar';
-import { SEO } from '../components/SEO';
 import { 
-  Brain, 
+  TrendingUp, 
   Shield, 
-  Globe, 
-  Zap, 
-  BarChart3, 
-  Bell,
-  TrendingUp,
+  Brain, 
+  ArrowRight,
   Activity,
   Lock,
-  Smartphone,
+  BarChart3,
+  Zap,
+  Target,
+  Cpu,
   Database,
+  Eye,
+  CheckCircle,
+  AlertTriangle,
   Users,
-  CheckCircle
+  BookOpen,
+  Play
 } from 'lucide-react';
+import { SEO } from '../components/SEO';
 
 export const Features: React.FC = () => {
-  const coreFeatures = [
-    {
-      icon: Brain,
-      title: 'AI-Powered Risk Analysis',
-      description: 'Advanced machine learning algorithms analyze market conditions in real-time, identifying potential risks and opportunities before they impact your positions.',
-      features: [
-        'Real-time market sentiment analysis',
-        'Predictive risk modeling',
-        'Pattern recognition and anomaly detection',
-        'Machine learning-based forecasting'
-      ]
-    },
-    {
-      icon: Shield,
-      title: 'Real-Time Risk Management',
-      description: 'Automated portfolio monitoring with instant alerts when your positions approach predefined risk thresholds, helping you protect capital.',
-      features: [
-        'Customizable risk thresholds',
-        'Portfolio volatility monitoring',
-        'Position concentration alerts',
-        'Stop-loss recommendations'
-      ]
-    },
-    {
-      icon: Globe,
-      title: 'Global News Integration',
-      description: 'Curated financial news from Thomson Reuters, Bloomberg, and premium sources, filtered and ranked by relevance to your portfolio.',
-      features: [
-        'Real-time news aggregation',
-        'AI-powered relevance filtering',
-        'Sentiment analysis',
-        'Breaking news alerts'
-      ]
-    },
-    {
-      icon: Zap,
-      title: 'Near-Term Trade Optimization',
-      description: 'Specialized algorithms designed for short-term trading strategies, optimizing entry and exit points based on technical and fundamental analysis.',
-      features: [
-        'Entry/exit point optimization',
-        'Technical indicator analysis',
-        'Market timing signals',
-        'Short-term trend identification'
-      ]
-    },
-    {
-      icon: BarChart3,
-      title: 'Advanced Analytics Dashboard',
-      description: 'Professional-grade charts and analytics tools with customizable indicators, allowing you to make data-driven decisions with confidence.',
-      features: [
-        'Customizable charts and indicators',
-        'Portfolio performance metrics',
-        'Historical backtesting',
-        'Real-time data visualization'
-      ]
-    },
-    {
-      icon: Bell,
-      title: 'Smart Alerts & Notifications',
-      description: 'Customizable alerts for price movements, news events, and risk thresholds delivered instantly via web, mobile, and email.',
-      features: [
-        'Multi-channel notifications',
-        'Price and volume alerts',
-        'News-based triggers',
-        'Custom alert conditions'
-      ]
-    }
-  ];
-
-  const additionalFeatures = [
-    {
-      icon: TrendingUp,
-      title: 'Portfolio Optimization',
-      description: 'AI-driven suggestions for portfolio rebalancing and position sizing'
-    },
-    {
-      icon: Activity,
-      title: 'Live Market Data',
-      description: 'Real-time quotes, level 2 data, and market depth information'
-    },
-    {
-      icon: Lock,
-      title: 'Enterprise Security',
-      description: 'Bank-level encryption and SOC 2 compliance for your data'
-    },
-    {
-      icon: Smartphone,
-      title: 'Mobile Apps',
-      description: 'Full-featured iOS and Android apps for trading on the go'
-    },
-    {
-      icon: Database,
-      title: 'Historical Data',
-      description: '10+ years of historical market data for backtesting'
-    },
-    {
-      icon: Users,
-      title: 'Multi-Account Support',
-      description: 'Manage multiple trading accounts from a single dashboard'
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       <SEO 
-        title="Features - Professional Trading Tools"
-        description="Discover General Exchange's comprehensive features: AI-powered risk analysis, real-time alerts, near-term trade optimization, advanced analytics, and Interactive Brokers integration."
-        keywords="trading features, AI risk analysis, trading alerts, portfolio analytics, options trading tools, risk management features, trade optimization"
+        title="Learn More - General Exchange Features"
+        description="Discover how General Exchange combines quantitative finance, stochastic modeling, and AI-driven inference to build smarter algorithmic trading engines for options professionals."
+        keywords="algorithmic trading features, quantitative finance, options trading platform, AI trading, risk management, Black-Scholes, Monte Carlo simulation, machine learning trading"
         canonical="https://generalexchange.com/features"
       />
-      <Navbar showSearch={false} />
       
-      <div className="pt-14 sm:pt-16">
-        {/* Hero Section */}
-        <section className="py-20 sm:py-32 bg-[#0a0a0a]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
-                Everything You Need to Trade Smarter
-              </h1>
-              <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
-                Professional-grade tools and AI-powered insights designed to help you manage risk and maximize returns on near-term trades
-              </p>
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-blue-600/30"
-              >
-                Start Free Trial
+      {/* Navigation */}
+      <nav className="bg-[#0a0a0a] border-b border-[#1a1a1a] sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Activity className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg sm:text-2xl font-serif font-bold text-white">General Exchange</span>
+            </Link>
+            <div className="flex items-center space-x-4">
+              <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
+              <Link to="/request-access" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                Get Started
               </Link>
             </div>
           </div>
-        </section>
+        </div>
+      </nav>
 
-        {/* Core Features */}
-        <section className="py-20 bg-[#0a0a0a] border-t border-[#2a2a2a]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Core Features</h2>
-              <p className="text-xl text-gray-400">The foundation of intelligent trading</p>
+        {/* Hero Section */}
+      <section className="relative overflow-hidden bg-[#0a0a0a] py-16 sm:py-24">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
+              Algorithmic Options Trading.
+              <span className="text-blue-400"> Evolved.</span>
+              </h1>
+            
+            <p className="text-lg sm:text-xl text-gray-400 leading-relaxed mb-8">
+              General Exchange blends quantitative finance, stochastic modeling, and AI-driven inference 
+              to build smarter trade engines for options professionals.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/request-access"
+                className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 group"
+              >
+                Get Started
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <button className="inline-flex items-center justify-center px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg border border-white/10 transition-all duration-200">
+                <Play className="mr-2 w-5 h-5" />
+                View Whitepaper
+              </button>
             </div>
-
-            <div className="space-y-20">
-              {coreFeatures.map((feature, index) => {
-                const Icon = feature.icon;
-                return (
-                  <div
-                    key={feature.title}
-                    className={`grid lg:grid-cols-2 gap-12 items-center ${
-                      index % 2 === 1 ? 'lg:flex-row-reverse' : ''
-                    }`}
-                  >
-                    <div className={index % 2 === 1 ? 'lg:order-2' : ''}>
-                      <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center mb-6">
-                        <Icon className="w-8 h-8 text-blue-400" />
-                      </div>
-                      <h3 className="text-3xl font-bold text-white mb-4">{feature.title}</h3>
-                      <p className="text-lg text-gray-400 mb-6">{feature.description}</p>
-                      <ul className="space-y-3">
-                        {feature.features.map((item) => (
-                          <li key={item} className="flex items-start space-x-3">
-                            <CheckCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
-                            <span className="text-gray-300">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div className={index % 2 === 1 ? 'lg:order-1' : ''}>
-                      <div className="bg-[#1a1a1a] border border-white/10 rounded-xl p-8 h-64 flex items-center justify-center">
-                        <Icon className="w-32 h-32 text-blue-400/20" />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </section>
 
-        {/* Additional Features */}
-        <section className="py-20 bg-[#0a0a0a] border-t border-[#2a2a2a]">
+      {/* About the Engine */}
+      <section className="py-16 sm:py-24 bg-[#0f0f0f]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                The Quantitative Framework
+              </h2>
+              <p className="text-lg text-gray-400 mb-6">
+                General Exchange merges mathematics, data science, and risk management into a unified framework. 
+                It serves as a quant-driven layer between theoretical models (like Black-Scholes) and practical market execution.
+              </p>
+              <p className="text-lg text-gray-400 mb-8">
+                Our platform integrates mathematical concepts into actionable signals through Delta and Gamma sensitivity modeling, 
+                volatility surface interpolation, dynamic hedging via payoff symmetry, and time-series anomaly detection for volatility regime shifts.
+              </p>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-blue-400">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="font-semibold">Real-time Analysis</span>
+                </div>
+                <div className="flex items-center space-x-2 text-blue-400">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="font-semibold">AI-Powered Insights</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-8">
+              <h3 className="text-xl font-semibold text-white mb-4">Core Analytics</h3>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">Delta-Based Momentum Engine</div>
+                    <div className="text-sm text-gray-400">Evaluates option Delta changes relative to underlying price movements</div>
+                  </div>
+                      </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-green-400" />
+                    </div>
+                  <div>
+                    <div className="text-white font-medium">Black-Scholes Risk Formatting</div>
+                    <div className="text-sm text-gray-400">Computes theoretical values with volatility skew integration</div>
+                      </div>
+                    </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <Brain className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">Machine Learning Clustering</div>
+                    <div className="text-sm text-gray-400">Identifies latent structures in time-series data</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </section>
+
+      {/* Key Features */}
+      <section className="py-16 sm:py-24 bg-[#0a0a0a]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                And Much More
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+              Advanced Analytics Engine
               </h2>
-              <p className="text-xl text-gray-400">
-                Additional features to enhance your trading experience
+            <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+              Modular engines that can evolve independently within the platform, 
+              each managing a specific part of the trading process.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {additionalFeatures.map((feature) => {
-                const Icon = feature.icon;
-                return (
-                  <div
-                    key={feature.title}
-                    className="p-6 bg-[#1a1a1a] border border-white/10 rounded-xl hover:border-blue-500/50 transition-all duration-300"
-                  >
-                    <div className="w-12 h-12 bg-blue-600/10 rounded-lg flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-blue-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
-                    <p className="text-gray-400">{feature.description}</p>
+            {/* Delta Momentum Engine */}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-blue-500/30 transition-colors">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                <TrendingUp className="w-6 h-6 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Delta-Based Momentum Engine</h3>
+              <p className="text-gray-400 mb-4">
+                Evaluates how option Deltas change relative to underlying price movements, 
+                identifying when Delta acceleration signals directional momentum.
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>• Quantifies trend strength and potential reversals</li>
+                <li>• Uses sensitivity data from option Greeks</li>
+                <li>• Identifies momentum shifts in real-time</li>
+              </ul>
+            </div>
+
+            {/* Black-Scholes Engine */}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-green-500/30 transition-colors">
+              <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Black-Scholes Risk Formatting</h3>
+              <p className="text-gray-400 mb-4">
+                Computes theoretical option values using the Black-Scholes-Merton model 
+                and integrates volatility skew data to normalize risk.
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>• Visual and numerical market pricing efficiency</li>
+                <li>• Normalizes risk across strikes and expirations</li>
+                <li>• Real-time theoretical value calculations</li>
+              </ul>
+            </div>
+
+            {/* Bollinger Band Tracker */}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-yellow-500/30 transition-colors">
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center mb-4">
+                <BarChart3 className="w-6 h-6 text-yellow-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Bollinger Band Volatility Tracker</h3>
+              <p className="text-gray-400 mb-4">
+                Uses deviations from Bollinger midlines to define entry and exit thresholds, 
+                combined with Delta analysis for dynamic rebalancing.
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>• Highlights volatility compression and expansion</li>
+                <li>• Dynamic rebalancing strategies</li>
+                <li>• Entry and exit threshold optimization</li>
+              </ul>
+            </div>
+
+            {/* Markov Chain Forecasting */}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-purple-500/30 transition-colors">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                <Brain className="w-6 h-6 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Markov Chain Forecasting</h3>
+              <p className="text-gray-400 mb-4">
+                Analyzes probabilistic state transitions in historical market data 
+                to determine likely next-phase price behavior.
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>• Transition probabilities between market states</li>
+                <li>• Bullish, bearish, and neutral volatility states</li>
+                <li>• Forward-looking market behavior prediction</li>
+              </ul>
+            </div>
+
+            {/* Monte Carlo Simulation */}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-orange-500/30 transition-colors">
+              <div className="w-12 h-12 bg-orange-500/20 rounded-lg flex items-center justify-center mb-4">
+                <Cpu className="w-6 h-6 text-orange-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Monte Carlo Simulation</h3>
+              <p className="text-gray-400 mb-4">
+                Runs stochastic simulations across Delta shifts and implied volatility levels 
+                to visualize potential payoff outcomes.
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>• Forward-looking risk distributions</li>
+                <li>• Confidence intervals for position sizing</li>
+                <li>• Stochastic scenario modeling</li>
+              </ul>
+            </div>
+
+            {/* Machine Learning */}
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6 hover:border-pink-500/30 transition-colors">
+              <div className="w-12 h-12 bg-pink-500/20 rounded-lg flex items-center justify-center mb-4">
+                <Database className="w-6 h-6 text-pink-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Unsupervised Machine Learning</h3>
+              <p className="text-gray-400 mb-4">
+                Utilizes k-means and PCA-style clustering to identify latent structures 
+                in time-series price and volatility data.
+              </p>
+              <ul className="text-sm text-gray-500 space-y-1">
+                <li>• Detects regime shifts and outlier events</li>
+                <li>• Adaptive algorithmic strategy selection</li>
+                <li>• Pattern recognition in market data</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Data Processing & Learning */}
+      <section className="py-16 sm:py-24 bg-[#0f0f0f]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-8">
+              <h3 className="text-2xl font-semibold text-white mb-6">Data Processing Pipeline</h3>
+              <div className="space-y-4">
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-500/20 rounded-full flex items-center justify-center mt-1">
+                    <Database className="w-3 h-3 text-blue-400" />
                   </div>
-                );
-              })}
+                  <div>
+                    <div className="text-white font-medium">Historical Data Collection</div>
+                    <div className="text-sm text-gray-400">Bid/ask spreads, implied volatility metrics, and realized volatility</div>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-green-500/20 rounded-full flex items-center justify-center mt-1">
+                    <Brain className="w-3 h-3 text-green-400" />
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">Adaptive Model Calibration</div>
+                    <div className="text-sm text-gray-400">Continuous learning from market data streams</div>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-purple-500/20 rounded-full flex items-center justify-center mt-1">
+                    <Zap className="w-3 h-3 text-purple-400" />
+                    </div>
+                  <div>
+                    <div className="text-white font-medium">Real-time Signal Generation</div>
+                    <div className="text-sm text-gray-400">Live analysis and decision support</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+                Data Processing & Learning
+              </h2>
+              <p className="text-lg text-gray-400 mb-6">
+                General Exchange collects, cleans, and feeds market data into its learning pipeline. 
+                We use historical bid/ask spreads, implied volatility metrics, and realized volatility 
+                for adaptive model calibration.
+              </p>
+              <p className="text-lg text-gray-400 mb-8">
+                The system continuously refines signal weighting based on live data streams and backtested model accuracy, 
+                learning from past trade efficiency to improve its signal-to-risk ratio over time.
+              </p>
+              <div className="flex items-center space-x-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-400">99.9%</div>
+                  <div className="text-sm text-gray-400">Uptime</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-400">&lt;50ms</div>
+                  <div className="text-sm text-gray-400">Latency</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-400">24/7</div>
+                  <div className="text-sm text-gray-400">Monitoring</div>
+                </div>
+              </div>
+            </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-20 bg-blue-600">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* Risk Visualization */}
+      <section className="py-16 sm:py-24 bg-[#0a0a0a]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-              Ready to Experience These Features?
+              Risk Illustration & Visualization
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Start your 14-day free trial today. No credit card required.
+            <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+              Generate intuitive risk visuals that help traders understand potential outcomes 
+              before executing strategies.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-10 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-100 transition-all duration-200"
-              >
-                Start Free Trial
-              </Link>
-              <Link
-                to="/pricing"
-                className="inline-flex items-center justify-center px-10 py-4 bg-transparent text-white font-bold rounded-lg border-2 border-white hover:bg-white/10 transition-all duration-200"
-              >
-                View Pricing
-              </Link>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-4">
+                <Target className="w-6 h-6 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Payoff Cones</h3>
+              <p className="text-gray-400">
+                Visualize potential profit/loss scenarios across multiple time horizons 
+                with statistical confidence intervals.
+              </p>
+            </div>
+            
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+              <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
+                <BarChart3 className="w-6 h-6 text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Volatility Heatmaps</h3>
+              <p className="text-gray-400">
+                Identify volatility clustering patterns and regime shifts 
+                through interactive heatmap visualizations.
+              </p>
+            </div>
+            
+            <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
+                <Eye className="w-6 h-6 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Monte Carlo Projections</h3>
+              <p className="text-gray-400">
+                Rolling Monte Carlo projections show forward-looking risk distributions 
+                and confidence intervals for position sizing.
+              </p>
+            </div>
             </div>
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="border-t border-[#2a2a2a] bg-[#0a0a0a] py-12">
+      {/* Use Cases */}
+      <section className="py-16 sm:py-24 bg-[#0f0f0f]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+              Use Cases
+            </h2>
+            <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+              General Exchange serves diverse trading professionals and institutions 
+              seeking advanced algorithmic capabilities.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
-              <p className="text-gray-500 text-sm">
-                © {new Date().getFullYear()} General Exchange. All rights reserved.
+              <div className="w-16 h-16 bg-blue-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-blue-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Quantitative Hedge Funds</h3>
+              <p className="text-gray-400">
+                Advanced modeling and risk management for institutional trading strategies.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-green-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="w-8 h-8 text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Retail Options Traders</h3>
+              <p className="text-gray-400">
+                Statistical edge and professional-grade analysis tools for individual traders.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-8 h-8 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Academic Research</h3>
+              <p className="text-gray-400">
+                Applied finance research and market data visualization for risk assessment.
+              </p>
+            </div>
+            
+            <div className="text-center">
+              <div className="w-16 h-16 bg-orange-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-orange-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Risk Management</h3>
+              <p className="text-gray-400">
+                Portfolio risk assessment and dynamic hedging strategies for institutions.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Compliance & Safety */}
+      <section className="py-16 sm:py-24 bg-[#0a0a0a]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-8">
+            <div className="w-16 h-16 bg-yellow-500/20 rounded-xl flex items-center justify-center mx-auto mb-6">
+              <AlertTriangle className="w-8 h-8 text-yellow-400" />
+            </div>
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              Compliance & Safety
+            </h2>
+            <p className="text-lg text-gray-400 mb-6">
+              All trading involves risk. No algorithm can guarantee profits. 
+              Past performance does not predict future results.
+            </p>
+            <div className="grid md:grid-cols-2 gap-6 text-left">
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">Model Interpretability</h3>
+                <p className="text-gray-400 text-sm">
+                  Our platform follows best practices for model interpretability, 
+                  ensuring transparency in algorithmic decision-making.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-2">Data Privacy</h3>
+                <p className="text-gray-400 text-sm">
+                  User data privacy is protected with enterprise-grade security 
+                  and compliance with financial regulations.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-16 sm:py-24 bg-[#0f0f0f]">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            Ready to Transform Your Trading?
+          </h2>
+          <p className="text-lg text-gray-400 mb-8">
+            Join the waitlist for early access or connect your brokerage APIs for simulation testing.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/request-access"
+              className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 group"
+            >
+              Join Waitlist
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <button className="inline-flex items-center justify-center px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg border border-white/10 transition-all duration-200">
+              <Play className="mr-2 w-5 h-5" />
+              Run Demo Simulation
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#0a0a0a] border-t border-[#1a1a1a] py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <Activity className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-lg font-serif font-bold text-white">General Exchange</span>
+            </div>
+            <p className="text-gray-400 text-sm">
+              © {new Date().getFullYear()} General Exchange. All rights reserved.
               </p>
             </div>
           </div>
         </footer>
-      </div>
     </div>
   );
 };
-

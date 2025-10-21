@@ -5,11 +5,11 @@
 import React, { useState, useEffect } from 'react';
 import { Search, TrendingUp, Eye, DollarSign } from 'lucide-react';
 import { NewsTicker } from '../components/NewsTicker';
-import { WatchlistCarousel } from '../components/WatchlistCarousel';
 import { StockSearchResults } from '../components/StockSearchResults';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { OptionsModal } from '../components/OptionsModal';
 import { OptionsScanner } from '../components/Scanner';
+import { TradeInsights } from '../components/TradeInsights';
 
 export const Dashboard: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,15 +53,6 @@ export const Dashboard: React.FC = () => {
     { id: '6', text: 'Unemployment rate falls to 3.8% in latest jobs report', category: 'ECONOMY' },
   ];
 
-  // Mock watchlist options
-  const watchlistOptions = [
-    { id: 1, symbol: 'SPY', type: 'CALL' as const, strike: 450, totalValue: 12500, return: '+22.4%' },
-    { id: 2, symbol: 'QQQ', type: 'CALL' as const, strike: 380, totalValue: 8900, return: '+18.7%' },
-    { id: 3, symbol: 'AAPL', type: 'PUT' as const, strike: 175, totalValue: 3200, return: '-3.2%' },
-    { id: 4, symbol: 'MSFT', type: 'CALL' as const, strike: 375, totalValue: 10200, return: '+26.1%' },
-    { id: 5, symbol: 'NVDA', type: 'CALL' as const, strike: 460, totalValue: 15800, return: '+42.3%' },
-    { id: 6, symbol: 'AMD', type: 'CALL' as const, strike: 145, totalValue: 6700, return: '+19.8%' },
-  ];
 
 
   // Handle scanner close (no result needed since it's a standalone scanner)
@@ -151,14 +142,11 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Sticky Section - Watchlist only */}
-        <div className="sticky top-0 z-40 bg-[#0a0a0a]">
-          {/* Watchlist Carousel */}
-          <WatchlistCarousel options={watchlistOptions} />
+        {/* Trade Insights Section - Real-Time Market Signals */}
+        <div className="mb-8 sm:mb-12">
+          <TradeInsights />
         </div>
 
-        {/* Spacer to prevent content from being hidden behind sticky section */}
-        <div className="h-8 sm:h-12"></div>
       </div>
 
       {/* Options Modal */}

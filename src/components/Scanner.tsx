@@ -191,7 +191,7 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
 
   const renderMessage = (message: ChatMessage) => {
     if (message.type === 'user') {
-      return (
+    return (
         <div className="flex justify-end mb-4">
           <div className="bg-blue-600 text-white rounded-2xl rounded-br-md px-4 py-3 max-w-xs lg:max-w-md">
             <p className="text-sm">{message.content}</p>
@@ -199,8 +199,8 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
         </div>
       );
     }
-
-    return (
+            
+            return (
       <div className="flex justify-start mb-4">
         <div className="bg-[#2a2a2a] text-white rounded-2xl rounded-bl-md px-4 py-3 max-w-xs lg:max-w-2xl">
           <div className="flex items-start gap-2 mb-2">
@@ -230,8 +230,8 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
                           <span className="text-sm font-semibold text-green-500">
                             {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                           </span>
-                        </div>
-                      </div>
+                  </div>
+                </div>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <span className="text-gray-400">Price:</span>
@@ -248,8 +248,8 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
                         <div>
                           <span className="text-gray-400">IV:</span>
                           <span className="text-purple-400 ml-1">{(stock.options.avgIV * 100).toFixed(1)}%</span>
-                        </div>
-                      </div>
+                </div>
+              </div>
                       {message.data.type === 'high_delta_options' && (
                         <div className="mt-2 pt-2 border-t border-[#3a3a3a]">
                           <div className="flex items-center justify-between text-xs">
@@ -259,13 +259,13 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
                           <div className="flex items-center justify-between text-xs mt-1">
                             <span className="text-gray-400">Calls vs Puts:</span>
                             <span className="text-green-400">{stock.options.calls} / {stock.options.puts}</span>
-                          </div>
-                        </div>
+        </div>
+            </div>
                       )}
                     </div>
                   ))}
-                </div>
-              )}
+          </div>
+        )}
 
               {message.data && message.data.type === 'stock_analysis' && (
                 <div className="mt-4 bg-[#1a1a1a] rounded-lg p-3 border border-[#3a3a3a]">
@@ -275,8 +275,8 @@ export const OptionsScanner: React.FC<OptionsScannerProps> = ({ onClose }) => {
                   </div>
                   <div className="text-xs text-gray-300">
                     Real-time data • Updated just now
-                  </div>
-                </div>
+      </div>
+              </div>
               )}
             </div>
           </div>

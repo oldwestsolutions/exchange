@@ -52,10 +52,10 @@ export const Homepage: React.FC = () => {
           {/* Animated background grid */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
           
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-20 lg:py-32">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Left Column - Main Message */}
-              <div className="space-y-8">
+              <div className="space-y-4 sm:space-y-8">
                 <div className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600/10 border border-blue-500/20 rounded-full">
                   <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
                   <span className="text-blue-400 text-sm font-medium">Connect with Interactive Brokers</span>
@@ -81,12 +81,12 @@ export const Homepage: React.FC = () => {
                     Start Trading Smarter
                     <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
-                  <a
-                    href="#features"
+                  <Link
+                    to="/features"
                     className="inline-flex items-center justify-center px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-lg border border-white/10 transition-all duration-200"
                   >
                     Explore Features
-                  </a>
+                  </Link>
                 </div>
                 
               </div>

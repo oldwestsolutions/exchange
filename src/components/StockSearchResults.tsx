@@ -38,8 +38,13 @@ export const StockSearchResults: React.FC<StockSearchResultsProps> = ({ query })
     // Financial & Banking
     'BRK.B': { symbol: 'BRK.B', name: 'Berkshire Hathaway Inc. Class B', price: 345.67, change: 2.34, changePercent: 0.68, volume: '8.2M', marketCap: '$800B' },
     'JPM': { symbol: 'JPM', name: 'JPMorgan Chase & Co.', price: 145.23, change: 1.89, changePercent: 1.32, volume: '12.4M', marketCap: '$450B' },
+    'GS': { symbol: 'GS', name: 'Goldman Sachs Group Inc.', price: 378.45, change: 5.67, changePercent: 1.52, volume: '2.8M', marketCap: '$120B' },
     'V': { symbol: 'V', name: 'Visa Inc.', price: 245.78, change: 3.45, changePercent: 1.42, volume: '6.8M', marketCap: '$520B' },
     'MA': { symbol: 'MA', name: 'Mastercard Incorporated', price: 412.56, change: 5.23, changePercent: 1.28, volume: '4.2M', marketCap: '$400B' },
+    
+    // Crypto & Blockchain
+    'COIN': { symbol: 'COIN', name: 'Coinbase Global Inc.', price: 245.67, change: 12.34, changePercent: 5.28, volume: '8.9M', marketCap: '$58B' },
+    'MSTR': { symbol: 'MSTR', name: 'MicroStrategy Incorporated', price: 1234.56, change: 45.67, changePercent: 3.84, volume: '1.2M', marketCap: '$21B' },
     
     // Healthcare & Pharma
     'UNH': { symbol: 'UNH', name: 'UnitedHealth Group Incorporated', price: 523.45, change: 8.92, changePercent: 1.73, volume: '3.2M', marketCap: '$490B' },
@@ -66,6 +71,10 @@ export const StockSearchResults: React.FC<StockSearchResultsProps> = ({ query })
     'CRM': { symbol: 'CRM', name: 'Salesforce Inc.', price: 245.67, change: 4.23, changePercent: 1.75, volume: '8.4M', marketCap: '$250B' },
     'AMD': { symbol: 'AMD', name: 'Advanced Micro Devices Inc.', price: 134.56, change: 3.45, changePercent: 2.63, volume: '45.2M', marketCap: '$220B' },
     'INTC': { symbol: 'INTC', name: 'Intel Corporation', price: 42.34, change: 0.89, changePercent: 2.15, volume: '28.7M', marketCap: '$180B' },
+    
+    // Crypto & Fintech
+    'COIN': { symbol: 'COIN', name: 'Coinbase Global Inc.', price: 156.78, change: 8.45, changePercent: 5.70, volume: '12.3M', marketCap: '$35B' },
+    'MSTR': { symbol: 'MSTR', name: 'MicroStrategy Incorporated', price: 445.67, change: 23.45, changePercent: 5.56, volume: '1.8M', marketCap: '$7.5B' },
     
     // Legacy entries for backward compatibility
     'IBM': { symbol: 'IBM', name: 'International Business Machines Corporation', price: 142.35, change: 2.47, changePercent: 1.77, volume: '4.2M', marketCap: '$131.2B' },
