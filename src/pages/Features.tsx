@@ -11,7 +11,6 @@ import {
   Brain, 
   ArrowRight,
   Activity,
-  Lock,
   BarChart3,
   Zap,
   Target,

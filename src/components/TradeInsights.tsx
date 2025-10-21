@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { TrendingUp, TrendingDown, Clock, Target, Zap, AlertTriangle, X, Eye, History } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Target, AlertTriangle, X, Eye, History } from 'lucide-react';
 import { getTradeInsights, createTradeInsightsStream, TradeInsightsResponse } from '../api/trade-insights';
 
 interface TradeSignal {
@@ -60,48 +60,18 @@ export const TradeInsights: React.FC = () => {
   const [apiConnected, setApiConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Simulate real-time data updates
-  const generateMockSignal = useCallback((): TradeSignal => {
-    const symbols = ['AAPL', 'MSFT', 'NVDA', 'AMZN', 'META', 'GOOGL', 'TSLA', 'GS', 'COIN', 'MSTR'];
-    const signalTypes = [
-      'Bollinger Breakout Long',
-      'Bollinger Reversal Short', 
-      'Order Book Imbalance Long',
-      'Payoff Cluster Entry',
-      'Volume Spike Breakout',
-      'Support Bounce Long',
-      'Resistance Rejection Short'
-    ];
-    
-    const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-    const basePrice = 100 + Math.random() * 400;
-    const entry = basePrice + (Math.random() - 0.5) * 10;
-    const exit = entry + (Math.random() - 0.5) * 20;
-    
-    return {
-      id: `signal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      symbol,
-      entry: Number(entry.toFixed(2)),
-      exit: Number(exit.toFixed(2)),
-      signal: signalTypes[Math.floor(Math.random() * signalTypes.length)],
-      payoff_score: Math.random() * 0.5 + 0.3,
-      confidence: Math.random() * 0.3 + 0.7,
-      timestamp: new Date().toISOString(),
-      type: Math.random() > 0.5 ? 'LONG' : 'SHORT',
-      status: 'ACTIVE'
-    };
-  }, []);
 
   // Fetch trade insights data from API
   const fetchTradeInsights = useCallback(async () => {
     try {
-      // Simulate API connection check - set to false for production ready state
-      const isConnected = false; // Always show "no feed" state for production
+      // Check for real API connection - no mock data
+      const isConnected = false; // Will be true when real API is connected
       setApiConnected(isConnected);
       
       if (!isConnected) {
         setError('API connection not available');
         setInsights([]); // Clear any existing insights
+        setExpiredSignals([]); // Clear expired signals
         setIsLoading(false);
         return;
       }
@@ -312,30 +282,28 @@ export const TradeInsights: React.FC = () => {
 
   return (
     <section className="trade-insights bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl overflow-hidden">
-      {/* Expired Signals Button */}
-      {expiredSignals.length > 0 && (
-        <div className="expired-trades-header bg-[#0f0f0f] border-b border-[#2a2a2a] p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-yellow-500" />
-              <h3 className="text-sm font-semibold text-white">Expired Signals</h3>
-              <span className="text-xs text-gray-400">({expiredSignals.length})</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsExpiredModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
-              >
-                <History className="w-4 h-4" />
-                View Expired Signals
-              </button>
-              <div className="text-xs text-gray-500">
-                Last updated: {lastUpdate.toLocaleTimeString()}
-              </div>
+      {/* Expired Signals Button - Always show */}
+      <div className="expired-trades-header bg-[#0f0f0f] border-b border-[#2a2a2a] p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-yellow-500" />
+            <h3 className="text-sm font-semibold text-white">Expired Signals</h3>
+            <span className="text-xs text-gray-400">({expiredSignals.length})</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsExpiredModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition-colors"
+            >
+              <History className="w-4 h-4" />
+              View Expired Signals
+            </button>
+            <div className="text-xs text-gray-500">
+              Last updated: {lastUpdate.toLocaleTimeString()}
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Main Trade Insights Section */}
       <div className="p-6">

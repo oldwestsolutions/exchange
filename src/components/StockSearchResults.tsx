@@ -72,9 +72,6 @@ export const StockSearchResults: React.FC<StockSearchResultsProps> = ({ query })
     'AMD': { symbol: 'AMD', name: 'Advanced Micro Devices Inc.', price: 134.56, change: 3.45, changePercent: 2.63, volume: '45.2M', marketCap: '$220B' },
     'INTC': { symbol: 'INTC', name: 'Intel Corporation', price: 42.34, change: 0.89, changePercent: 2.15, volume: '28.7M', marketCap: '$180B' },
     
-    // Crypto & Fintech
-    'COIN': { symbol: 'COIN', name: 'Coinbase Global Inc.', price: 156.78, change: 8.45, changePercent: 5.70, volume: '12.3M', marketCap: '$35B' },
-    'MSTR': { symbol: 'MSTR', name: 'MicroStrategy Incorporated', price: 445.67, change: 23.45, changePercent: 5.56, volume: '1.8M', marketCap: '$7.5B' },
     
     // Legacy entries for backward compatibility
     'IBM': { symbol: 'IBM', name: 'International Business Machines Corporation', price: 142.35, change: 2.47, changePercent: 1.77, volume: '4.2M', marketCap: '$131.2B' },
